@@ -16,6 +16,7 @@ A modern, interactive casino website featuring multiple games with beautiful ani
 - 📱 Mobile-friendly layout
 - 🎯 Interactive game mechanics
 - 💰 Balance tracking system
+- 💳 Deposits & Withdrawals (manage your balance with validation and history)
 
 ## 🚀 Getting Started
 
@@ -55,6 +56,17 @@ That's it! No build process or package installation needed.
 4. Click "Stand" when you're satisfied
 5. Beat the dealer without going over 21!
 
+### Deposits & Withdrawals
+1. Click Deposit or Withdraw in the top bar.
+2. Enter an amount (minimum $10).
+3. Submit to adjust your balance.
+4. Recent transactions are logged (latest 15).
+5. Large deposits ($1000+) trigger a celebration effect.
+
+Constraints:
+- Withdrawals cannot exceed current balance.
+- All amounts are integers; balance resets on page refresh.
+
 ## 💡 Tips
 
 - Start with smaller bets to learn the games
@@ -74,6 +86,7 @@ That's it! No build process or package installation needed.
 - This is a demo casino website for entertainment purposes
 - All games use client-side random number generation
 - Balance is stored in browser memory (resets on page refresh)
+- Transactions (deposit/withdraw) are ephemeral and not persisted
 - Play responsibly!
 
 ## 🎨 Customization
