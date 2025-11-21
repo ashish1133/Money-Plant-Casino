@@ -25,3 +25,12 @@ server/logs/
 .DS_Store
 Thumbs.db
 .vscode/
+.idea/
+
+# Cache & temp
+.cache/
+tmp/
+
+# Extra logs/pids
+*.log
+*.pid
