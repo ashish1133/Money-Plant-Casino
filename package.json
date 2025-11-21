@@ -1,0 +1,17 @@
+{
+  "name": "money-plant-casino-web",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Frontend build for Lucky Casino (PostCSS + Autoprefixer)",
+  "scripts": {
+    "css:build": "postcss styles.css -o dist/styles.css",
+    "css:watch": "postcss styles.css -o dist/styles.css -w",
+    "build": "npm run css:build",
+    "dev": "npm run css:watch"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "postcss-cli": "^10.1.0"
+  }
+}

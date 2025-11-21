@@ -1,0 +1,37 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Build artifacts
+# Keep dist tracked for static hosting of built CSS
+# If you add a CI build, you can re-ignore dist then
+build/
+coverage/
+
+# Environment
+.env
+server/.env
+
+# Logs
+logs/
+server/logs/
+
+# SQLite/DB files
+*.sqlite
+*.sqlite3
+*.db
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Cache & temp
+.cache/
+tmp/
+
+# Extra logs/pids
+*.log
+*.pid
