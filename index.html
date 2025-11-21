@@ -17,7 +17,12 @@
                 <span class="logo-icon">🎰</span>
                 <span class="logo-text">Lucky Casino</span>
             </div>
-            <div class="nav-links">
+            <button class="nav-toggle" id="navToggle" type="button" aria-label="Toggle navigation" aria-controls="primaryNav" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="nav-links" id="primaryNav">
                 <a href="#home" class="nav-link active">Home</a>
                 <a href="#games" class="nav-link">Games</a>
                 <button class="nav-link nav-btn" type="button" data-modal="leaderboardModal">Leaderboard</button>
@@ -47,6 +52,7 @@
             </div>
         </div>
     </nav>
+    <div class="nav-overlay" id="navOverlay" aria-hidden="true"></div>
 
     <!-- Hero Section -->
     <section id="home" class="hero reveal" aria-labelledby="hero-heading">
