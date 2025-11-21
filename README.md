@@ -1,38 +1,107 @@
 # 🎰 Lucky Casino - Premium Gaming Experience
 
-A modern, interactive casino website featuring multiple games with beautiful animations and a stunning UI.
+An end‑to‑end demo casino platform: rich animated frontend + Node.js/Express backend (SQLite) with authentication, wallet, progression (XP & levels), achievements, leaderboards, and provably fair gameplay.
 
-## 🎮 Features
+## 🎮 Frontend Features
 
 ### Games
-- **Slot Machine** - Spin the reels and win big with various symbol combinations
-- **Roulette** - Bet on red, black, or green for exciting wins
-- **Blackjack** - Classic card game where you beat the dealer
+| Game | Mechanics | Notes |
+|------|-----------|-------|
+| Slots | 3 reels, symbol matching | Server authoritative RNG + seed/hash for fairness |
+| Roulette | Color bet (red/black/green) | Payouts 2x / 2x / 14x (example) |
+| Blackjack | Dealer vs player | Hit / Stand flows with server-side deck state |
 
-### Design Features
-- ✨ Modern, responsive design
-- 🎨 Beautiful casino-themed UI with gold accents
-- 🌟 Smooth animations and transitions
-- 📱 Mobile-friendly layout
-- 🎯 Interactive game mechanics
-- 💰 Balance tracking system
-- 💳 Deposits & Withdrawals (manage your balance with validation and history)
+### UI / UX
+- ✨ Responsive neon/dark luxury theme (Orbitron + Roboto)
+- 🌀 Animated metrics, live ticker, heatmap, spotlight events
+- 🧩 Accessible focus styles & keyboard trapping in modals
+- 🏆 Achievements + stats + leaderboard modals
+- 📊 XP bar with dynamic level progression
+- ⚖ Provably fair verification (seed/hash validity check)
 
-## 🚀 Getting Started
+### Economy / Meta
+- 💳 Wallet: deposit, withdraw, transaction history (persisted)
+- 📈 XP gain per wager, level thresholds (1000 XP per level)
+- 🏆 Achievements (first win, streaks, big win, mastery, etc.)
+- 🔁 Daily bonus with streak scaling
+- 🥇 Leaderboards: net profit, level, per‑game profit
 
-### Prerequisites
-- A modern web browser (Chrome, Firefox, Safari, Edge)
-- No additional dependencies required!
+## 🔧 Backend Features
+- Node.js + Express server (`server/`)
+- SQLite via better-sqlite3 (fast synchronous queries)
+- Auth: JWT access + refresh tokens, secure refresh flow
+- Services split by domain (`services/*`): auth, wallet, games, progression, leaderboard
+- Provably Fair RNG (`utils/fairRNG.js`): seed + HMAC hash exposure + verification endpoint
+- Middleware: authentication, rate limiting, helmet, CORS (multi-origin)
+- Structured logging (Winston) & error handling
+- Progression and achievement unlocking integrated into game results
 
-### Installation
+## 🌐 API Overview (High Level)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/auth/register` | POST | Create account (returns tokens) |
+| `/api/auth/login` | POST | Authenticate |
+| `/api/auth/refresh` | POST | Refresh access token |
+| `/api/wallet/deposit` | POST | Add funds |
+| `/api/wallet/withdraw` | POST | Remove funds |
+| `/api/wallet/transactions` | GET | Paginated transaction list |
+| `/api/games/slots` | POST | Play slots round |
+| `/api/games/roulette` | POST | Play roulette round |
+| `/api/games/blackjack` | POST | Deal / Hit / Stand (action param) |
+| `/api/games/verify` | POST | Validate seed/hash combo |
+| `/api/users/profile` | GET | User profile + progression snapshot |
+| `/api/users/stats` | GET | Aggregated gameplay stats |
+| `/api/users/achievements` | GET | Achievement list |
+| `/api/users/daily-bonus` | POST | Claim daily bonus |
+| `/api/users/leaderboard` | GET | Leaderboard by type/game |
 
-1. Clone or download this repository
-2. Open `index.html` in your web browser
-3. Start playing!
+## 🧩 Dynamic API Base URL
+Frontend auto-detects backend base via `api-client.js` priority:
+1. `window.API_BASE_URL` global (define before scripts)
+2. `<meta name="api-base" content="https://your-backend-domain/api">`
+3. `localhost` fallback when hostname is `localhost`
+4. Same-origin `/api` for combined deployment
 
-That's it! No build process or package installation needed.
+Add in `index.html` head for production:
+```html
+<meta name="api-base" content="https://casino-backend.example/api">
+```
+Or inline before loading scripts:
+```html
+<script>window.API_BASE_URL='https://casino-backend.example/api';</script>
+```
 
-## 🎯 How to Play
+## 🚀 Quick Start (Local Full Stack)
+```bash
+git clone https://github.com/ashish1133/Money-Plant-Casino.git
+cd Money-Plant-Casino
+cp .env.example .env   # edit secrets, origins
+cd server
+npm install            # install backend dependencies
+node server.js         # starts API on :3000
+```
+Open `index.html` directly (or serve with VS Code Live Server / simple HTTP) — API calls hit `http://localhost:3000/api`.
+
+### Docker
+```bash
+docker compose up --build -d
+```
+Backend: `http://localhost:3000/api` (static frontend also served). The dynamic base picks same-origin `/api` when accessed through the container host mapping.
+
+### Environment Variables (`.env`)
+| Variable | Description |
+|----------|-------------|
+| `PORT` | Backend port (default 3000) |
+| `CORS_ORIGINS` | Comma-separated allowed origins (frontend URLs) |
+| `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | Long random secrets for signing tokens |
+| `SQLITE_DB_PATH` | Path to DB file (e.g. `./data/casino.db`) |
+| `ACCESS_TOKEN_EXPIRY` | e.g. `15m` |
+| `REFRESH_TOKEN_EXPIRY` | e.g. `7d` |
+
+### Multi-Origin CORS
+Set `CORS_ORIGINS=https://casino.example,https://pages.example` to allow both deployments. Requests from other origins are rejected.
+
+## 🎯 Gameplay Summary
 
 ### Slot Machine
 1. Set your bet amount (minimum $10)
@@ -74,32 +143,44 @@ Constraints:
 - Each game has different odds and strategies
 - Have fun and play responsibly!
 
-## 🛠️ Technologies Used
+## 🛠️ Tech Stack
+- Frontend: HTML5 / CSS3 / Vanilla JS
+- Backend: Node.js + Express + better-sqlite3
+- Auth: JWT (access + refresh) with secure rotation
+- RNG: Seed + hash for provable fairness
+- Logging: Winston
+- Rate limiting: `express-rate-limit`
+- Docker / Compose for containerized deployment
 
-- HTML5
-- CSS3 (with animations and gradients)
-- Vanilla JavaScript (no frameworks required)
-- Google Fonts (Orbitron & Roboto)
-
-## 📝 Notes
-
-- This is a demo casino website for entertainment purposes
-- All games use client-side random number generation
-- Balance is stored in browser memory (resets on page refresh)
-- Transactions (deposit/withdraw) are ephemeral and not persisted
-- Play responsibly!
+## 📝 Notes & Disclaimers
+- Entertainment / demo only – no real gambling.
+- RNG & fairness logic provided for educational purposes.
+- Replace secrets in production; never commit real JWT keys.
+- Configure HTTPS + secure cookie flags if extending auth scope.
+- Implement KYC / AML / responsible gaming features for any real deployment.
 
 ## 🎨 Customization
+Edit:
+- Theme tokens in `styles.css` (`:root` variables)
+- Game math & payouts in `server/services/gameService.js`
+- Progression thresholds in `progressionService.js`
+- Achievements definitions in corresponding service (extend criteria)
+- Frontend animations / cards / metrics in `script.js`
 
-Feel free to customize:
-- Colors in `styles.css` (CSS variables)
-- Game rules and payouts in `script.js`
-- Add more games or features
-- Modify the design to match your preferences
+Add new game: create service + route under `server/services` & `server/routes`, expose endpoint, integrate UI modal.
+
+## ✅ Deployment Checklist
+1. Set real JWT secrets in `.env`
+2. Configure `CORS_ORIGINS` with final frontend domains
+3. Persist SQLite `./data` directory (volume in Docker)
+4. Add automated backups / migrations if scaling
+5. Serve over HTTPS (reverse proxy: Nginx / Caddy / cloud host)
+6. Monitor logs (stdout aggregation or external service)
+7. Optionally add CI for lint/test & tagging releases
 
 ## 📄 License
 
-This project is open source and available for personal and educational use.
+Open source for personal & educational use. Not for real-money gambling without proper legal compliance.
 
 ---
 

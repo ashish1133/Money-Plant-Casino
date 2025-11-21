@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 const { initDatabase } = require('./config/database');
 const logger = require('./config/logger');
 
@@ -15,8 +16,17 @@ const app = express();
 
 // Security middleware
 app.use(helmet());
+
+// CORS: support multiple comma-separated origins (CORS_ORIGINS) or single legacy CORS_ORIGIN
+const allowedOriginsRaw = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN || 'http://localhost:8000';
+const allowedOrigins = allowedOriginsRaw.split(',').map(o => o.trim()).filter(Boolean);
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:8000',
+    origin: (origin, callback) => {
+        // Allow non-browser / same-origin requests (no origin header)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        return callback(new Error(`CORS blocked origin: ${origin}`));
+    },
     credentials: true
 }));
 
@@ -33,6 +43,9 @@ const limiter = rateLimit({
 });
 
 app.use('/api/', limiter);
+
+// Static frontend (serves index.html and assets if deployed together)
+app.use(express.static(path.join(__dirname, '..')));
 
 // Routes
 app.use('/api/auth', authRoutes);
