@@ -1,4 +1,29 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+// Dynamic API base URL resolution:
+// Priority order:
+// 1. window.API_BASE_URL (set before script load)
+// 2. <meta name="api-base" content="https://backend.example/api"> tag
+// 3. If running on localhost -> http://localhost:3000/api
+// 4. Otherwise derive from current origin (same-domain deployment) + '/api'
+// This allows the same bundled frontend to work on GitHub Pages (with a deployed backend)
+// or when served directly by the Express server.
+let API_BASE_URL = 'http://localhost:3000/api';
+try {
+    if (typeof window !== 'undefined') {
+        if (window.API_BASE_URL) {
+            API_BASE_URL = window.API_BASE_URL;
+        } else {
+            const meta = document.querySelector('meta[name="api-base"]');
+            if (meta && meta.content) {
+                API_BASE_URL = meta.content.trim();
+            } else if (window.location.hostname !== 'localhost') {
+                // Assume same-domain deployment for production unless overridden
+                API_BASE_URL = window.location.origin.replace(/\/$/, '') + '/api';
+            }
+        }
+    }
+} catch (e) {
+    console.warn('API base URL auto-detect failed, using default', e);
+}
 
 class APIClient {
     constructor() {
