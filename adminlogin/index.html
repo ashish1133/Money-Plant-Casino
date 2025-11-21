@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Login - MoneyPlant Casino</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body {font-family: system-ui, Arial, sans-serif; background:#0f0f17; color:#eee; display:flex; min-height:100vh; align-items:center; justify-content:center;}
+    .panel {background:#181828; padding:2rem 2.25rem; border-radius:14px; width:100%; max-width:380px; box-shadow:0 10px 32px -8px rgba(0,0,0,.6),0 0 0 1px #222;}
+    h1 {margin:0 0 1.25rem; font-size:1.4rem; letter-spacing:.5px;}
+    label {display:block; font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.25rem; color:#aaa;}
+    input {width:100%; padding:.65rem .75rem; border-radius:8px; border:1px solid #2a2a3c; background:#1f1f2e; color:#eee; font-size:.9rem;}
+    input:focus {outline:2px solid #3b82f6;}
+    .field {margin-bottom:1rem;}
+    button {width:100%; padding:.75rem 1rem; background:linear-gradient(135deg,#6366f1,#3b82f6); color:#fff; font-weight:600; border:none; border-radius:10px; cursor:pointer; font-size:.95rem; box-shadow:0 4px 12px -2px rgba(0,0,0,.5);} 
+    button:hover {filter:brightness(1.1);} 
+    .msg {margin-top:1rem; font-size:.8rem; min-height:1.1rem;}
+    .warn {margin-top:1.25rem; font-size:.7rem; color:#ffb347; line-height:1.2;}
+    .token-block {margin-top:1rem; background:#111; padding:.75rem; border:1px solid #333; border-radius:8px; font-size:.7rem; word-break:break-all;}
+    a.dashboard {display:inline-block; margin-top:1rem; font-size:.8rem; color:#3b82f6; text-decoration:none;}
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h1>Admin Login</h1>
+    <form id="admin-login-form">
+      <div class="field">
+        <label for="username">Username</label>
+        <input id="username" name="username" autocomplete="username" required />
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required />
+      </div>
+      <button type="submit">Login</button>
+      <div class="msg" id="msg"></div>
+    </form>
+    <div id="token-wrapper" style="display:none;">
+      <div class="token-block" id="token"></div>
+      <a class="dashboard" href="/admin/" target="_blank">Open Admin Dashboard ↗</a>
+    </div>
+    <p class="warn">Ensure ENV `ADMIN_USERNAME`, `ADMIN_PASSWORD`, and `ADMIN_JWT_SECRET` are set on the backend. This demo token expires in 2h.</p>
+  </div>
+  <script>
+    async function login(e){
+      e.preventDefault();
+      const msg = document.getElementById('msg');
+      msg.textContent='Authenticating...';
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      try {
+        const res = await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+        const data = await res.json();
+        if(!res.ok){
+          msg.textContent = data.error || 'Login failed';
+          msg.style.color = '#f87171';
+          return;
+        }
+        msg.textContent = 'Login successful';
+        msg.style.color = '#34d399';
+        document.getElementById('token').textContent = data.token;
+        document.getElementById('token-wrapper').style.display='block';
+        try { localStorage.setItem('ADMIN_TOKEN', data.token); } catch(_){}
+      } catch(err){
+        msg.textContent = err.message;
+        msg.style.color = '#f87171';
+      }
+    }
+    document.getElementById('admin-login-form').addEventListener('submit', login);
+  </script>
+</body>
+</html>

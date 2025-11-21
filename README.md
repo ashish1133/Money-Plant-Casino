@@ -178,6 +178,54 @@ Add new game: create service + route under `server/services` & `server/routes`, 
 6. Monitor logs (stdout aggregation or external service)
 7. Optionally add CI for lint/test & tagging releases
 
+## 🛠 Admin Dashboard (Unauthenticated Demo)
+
+An unsecured admin dashboard has been added under `admin/` for demonstration purposes.
+
+Access:
+```
+http://localhost:3000/admin/
+```
+Endpoints exposed (no auth):
+- `GET /api/admin/overview` – aggregate counts (users, balances sum, transactions, games, profit)
+- `GET /api/admin/users?limit=100` – recent users with balance & progression
+- `GET /api/admin/transactions?limit=50` – latest transactions
+- `GET /api/admin/game-results?limit=50` – latest game outcomes
+
+Front‑end auto‑refreshes every 30s.
+
+⚠ SECURITY: These endpoints are intentionally left public per request. For any real environment you MUST secure or remove them:
+- Add API key header check (e.g. `X-ADMIN-KEY`) with secret stored in `.env`
+- Or require admin JWT role via middleware
+- Or disable by removing `app.use('/api/admin', adminRoutes);` and the `admin/` folder
+
+To secure quickly with an API key:
+1. Set `ADMIN_API_KEY="some-long-random-string"` in `.env`
+2. Wrap admin routes with middleware verifying `req.headers['x-admin-key'] === process.env.ADMIN_API_KEY`
+3. Rebuild / restart server.
+
+Never leave sensitive operational data publicly exposed in production.
+
+### Admin Login
+
+A protected admin login endpoint has been added:
+- `POST /api/admin/login` (expects JSON `{ username, password }` matching ENV vars)
+
+Environment variables required:
+```
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=change-me
+ADMIN_JWT_SECRET=long-random-secret
+```
+
+Login issues a JWT valid for 2h used by dashboard requests (`Authorization: Bearer <token>`).
+
+Login Page URL: `https://moneyplant.live/adminlogin` (served by `adminlogin/index.html`).
+After login, open `https://moneyplant.live/admin/` — dashboard JS must be modified to include auth header if you secure the routes. (Currently the dashboard endpoints require the admin token.)
+
+Token storage: The demo login stores token in `localStorage.ADMIN_TOKEN`; adapt to more secure storage if needed.
+
+To revoke access: rotate `ADMIN_JWT_SECRET` and/or change credentials and restart server.
 ## 📄 License
 
 Open source for personal & educational use. Not for real-money gambling without proper legal compliance.
