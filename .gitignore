@@ -1,0 +1,27 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Build artifacts
+dist/
+build/
+coverage/
+
+# Environment
+.env
+server/.env
+
+# Logs
+logs/
+server/logs/
+
+# SQLite/DB files
+*.sqlite
+*.sqlite3
+*.db
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
