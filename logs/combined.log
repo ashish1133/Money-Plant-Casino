@@ -1,0 +1,22 @@
+{"level":"info","message":"Initializing database...","service":"casino-api","timestamp":"2025-11-29T20:52:15.163Z"}
+{"level":"info","message":"Database initialized successfully!","service":"casino-api","timestamp":"2025-11-29T20:52:15.214Z"}
+{"level":"info","message":"Tables created:","service":"casino-api","timestamp":"2025-11-29T20:52:15.214Z"}
+{"level":"info","message":"  - users","service":"casino-api","timestamp":"2025-11-29T20:52:15.214Z"}
+{"level":"info","message":"  - balances","service":"casino-api","timestamp":"2025-11-29T20:52:15.215Z"}
+{"level":"info","message":"  - transactions","service":"casino-api","timestamp":"2025-11-29T20:52:15.215Z"}
+{"level":"info","message":"  - game_results","service":"casino-api","timestamp":"2025-11-29T20:52:15.215Z"}
+{"level":"info","message":"  - achievements","service":"casino-api","timestamp":"2025-11-29T20:52:15.215Z"}
+{"level":"info","message":"  - daily_streaks","service":"casino-api","timestamp":"2025-11-29T20:52:15.216Z"}
+{"level":"info","message":"  - refresh_tokens","service":"casino-api","timestamp":"2025-11-29T20:52:15.216Z"}
+{"level":"info","message":"Server running on port 3000","service":"casino-api","timestamp":"2025-11-29T20:52:15.575Z"}
+{"level":"info","message":"Environment: development","service":"casino-api","timestamp":"2025-11-29T20:52:15.578Z"}
+{"level":"info","message":"Initializing database...","service":"casino-api","timestamp":"2025-11-29T20:57:38.588Z"}
+{"level":"info","message":"Database initialized successfully!","service":"casino-api","timestamp":"2025-11-29T20:57:38.592Z"}
+{"level":"info","message":"Tables created:","service":"casino-api","timestamp":"2025-11-29T20:57:38.593Z"}
+{"level":"info","message":"  - users","service":"casino-api","timestamp":"2025-11-29T20:57:38.593Z"}
+{"level":"info","message":"  - balances","service":"casino-api","timestamp":"2025-11-29T20:57:38.593Z"}
+{"level":"info","message":"  - transactions","service":"casino-api","timestamp":"2025-11-29T20:57:38.594Z"}
+{"level":"info","message":"  - game_results","service":"casino-api","timestamp":"2025-11-29T20:57:38.594Z"}
+{"level":"info","message":"  - achievements","service":"casino-api","timestamp":"2025-11-29T20:57:38.594Z"}
+{"level":"info","message":"  - daily_streaks","service":"casino-api","timestamp":"2025-11-29T20:57:38.595Z"}
+{"level":"info","message":"  - refresh_tokens","service":"casino-api","timestamp":"2025-11-29T20:57:38.595Z"}
