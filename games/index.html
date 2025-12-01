@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game • Lucky Casino</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script>
+    try{ if(localStorage.getItem('perf:mode')==='1'){ document.documentElement.classList.add('perf-mode'); } }catch(_){ }
+  </script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo" onclick="location.href='/'" style="cursor:pointer">
+        <img src="../assets/logo.svg" alt="Lucky Casino logo" width="28" height="28" class="logo-icon" />
+        <span class="logo-text">Lucky Casino</span>
+      </div>
+      <div></div>
+      <div class="user-section">
+        <a class="btn btn-outline" href="/">Home</a>
+        <a class="btn btn-outline" href="/userlogin/?signup=1">Register</a>
+        <a class="btn btn-primary" href="/index.html#catalog">Catalog</a>
+      </div>
+    </div>
+  </nav>
+  <div style="height:72px"></div>
+
+  <main class="container" id="gamePage">
+    <nav class="breadcrumbs"><a href="/">Home</a> <span>/</span> <a href="/index.html#catalog">Games</a> <span>/</span> <a id="bcCategory" href="#">Category</a> <span>/</span> <span id="bcGame">Game</span></nav>
+    <h1 class="section-title" id="gpTitle">Game</h1>
+    <p id="gpDesc" class="section-subtitle">Loading details…</p>
+
+    <div class="experience-grid" id="gpStats" style="margin-top:12px">
+      <article class="experience-card">
+        <div>RTP</div>
+        <h3 id="gpRTP">—</h3>
+      </article>
+      <article class="experience-card">
+        <div>House Edge</div>
+        <h3 id="gpEdge">—</h3>
+      </article>
+      <article class="experience-card">
+        <div>Risk</div>
+        <h3 id="gpRisk">—</h3>
+      </article>
+    </div>
+
+    <section class="reveal" style="margin-top:20px">
+      <h3>Play</h3>
+      <div id="playPanel" class="modal-content" style="max-width:560px;padding:16px">
+        <div id="playForm"></div>
+        <div id="playResult" class="win-message" style="margin-top:8px"></div>
+      </div>
+    </section>
+
+    <section class="reveal" style="margin-top:22px">
+      <h4>Example Outcomes</h4>
+      <ul id="gpExamples"></ul>
+    </section>
+
+    <section class="reveal" style="margin-top:22px">
+      <h4>RTP & Volatility</h4>
+      <div class="chart-row">
+        <div class="rtp-bar"><div id="rtpFill" class="rtp-fill" style="width:0%"></div></div>
+        <div class="vol-gauge"><div class="gauge-needle" id="volNeedle"></div><div class="gauge-label" id="volLabel">—</div></div>
+      </div>
+    </section>
+
+    <section class="reveal" style="margin-top:22px">
+      <h4>Quick-Play History</h4>
+      <ul id="gpHistory" class="history-list"></ul>
+      <button class="btn btn-small btn-outline" id="clearHistory">Clear History</button>
+    </section>
+
+    <section style="margin-top:22px;display:flex;gap:12px;justify-content:space-between">
+      <a id="prevGame" class="btn btn-outline" href="#">← Previous</a>
+      <a id="nextGame" class="btn" href="#">Next →</a>
+    </section>
+  </main>
+
+  <script src="../api-client.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const key = params.get('game');
+    if(!key){ document.getElementById('gpTitle').textContent='Unknown Game'; }
+
+    const gameConfig = {
+      slots: { fields:[{id:'bet',label:'Bet ($)',type:'number',min:10,step:1,val:10}], play: async (v)=>await apiClient.playSlots(v.bet) },
+      roulette: { fields:[{id:'bet',label:'Bet ($)',type:'number',min:10,step:1,val:10},{id:'color',label:'Color',type:'select',options:[{v:'red',t:'Red'},{v:'black',t:'Black'},{v:'green',t:'Green'}],val:'red'}], play: async (v)=>await apiClient.playRoulette(v.bet, v.color) },
+      blackjack: { fields:[{id:'bet',label:'Bet ($)',type:'number',min:10,step:1,val:10}], play: async (v)=>{ const d=await apiClient.dealBlackjack(v.bet); return d; } },
+      crash: { fields:[{id:'bet',label:'Bet ($)',type:'number',min:10,step:1,val:10},{id:'auto',label:'Auto Cashout (x)',type:'number',min:1.01,step:0.01,val:2.00}], play: async (v)=>await apiClient.playCrash(v.bet, v.auto) },
+      dice: { fields:[{id:'bet',label:'Bet ($)',type:'number',min:10,step:1,val:10},{id:'target',label:'Target (2–98)',type:'number',min:2,max:98,step:1,val:50}], play: async (v)=>await apiClient.playDice(v.bet, v.target) },
+      plinko: { fields:[{id:'bet',label:'Bet ($)',type:'number',min:10,step:1,val:10},{id:'rows',label:'Rows (6–16)',type:'number',min:6,max:16,step:1,val:8}], play: async (v)=>await apiClient.playPlinko(v.bet, v.rows) },
+      limbo: { fields:[{id:'bet',label:'Bet ($)',type:'number',min:10,step:1,val:10},{id:'target',label:'Target (x)',type:'number',min:1.01,step:0.01,val:2.00}], play: async (v)=>await apiClient.playLimbo(v.bet, v.target) },
+      mines: { fields:[{id:'bet',label:'Bet ($)',type:'number',min:10,step:1,val:10},{id:'bombs',label:'Bombs (1–24)',type:'number',min:1,max:24,step:1,val:3},{id:'picks',label:'Picks (1–24)',type:'number',min:1,max:24,step:1,val:3}], play: async (v)=>await apiClient.playMines(v.bet, v.bombs, v.picks) }
+    };
+
+    function setEl(id, text){ const el=document.getElementById(id); if(el) el.textContent=text; }
+    function fmtPct(n){ return Number.isFinite(n)? (n*100).toFixed(2)+'%':'—'; }
+
+    let allGamesCache=null;
+    async function loadDetails(){
+      const data = await apiClient.getGamesCatalog();
+      const all = (data.categories||[]).flatMap(c => (c.games||[]).map(g => ({...g, category:c.key, categoryName:c.title})));
+      allGamesCache = all;
+      const g = all.find(x=>x.key===key);
+      if(!g){ setEl('gpTitle','Unknown Game'); return; }
+      setEl('gpTitle', g.name);
+      setEl('gpDesc', g.type==='table' ? 'Table game' : (g.type||'Game'));
+      const rtp = (g.edge!=null) ? (100 - g.edge*100) : null;
+      setEl('gpRTP', rtp!=null ? rtp.toFixed(2)+'%' : '—');
+      setEl('gpEdge', g.edge!=null ? (g.edge*100).toFixed(2)+'%' : '—');
+      setEl('gpRisk', g.edge!=null ? (g.edge<=0.01?'Low':g.edge<=0.02?'Medium':'High') : '—');
+      // Breadcrumbs
+      document.getElementById('bcCategory').textContent = g.categoryName||'Category';
+      document.getElementById('bcCategory').href = `/categories/${encodeURIComponent(g.category||'featured')}/`;
+      document.getElementById('bcGame').textContent = g.name;
+      renderExamples(g.key, g.edge);
+      renderPlayForm(g.key);
+      renderCharts(rtp, g.edge);
+      wireNextPrev(g.key, g.category);
+      renderHistory(g.key);
+    }
+
+    function renderExamples(k, edge){
+      const e = (edge!=null)? (edge*100).toFixed(1)+'%' : '—';
+      const map={
+        slots:["Three 7s: 10x","Two cherries: 2x","Mixed: 0x"],
+        roulette:["Red win: 2x","Black win: 2x","Green hit: 10x"],
+        blackjack:["21 vs 18: 2x","Push 20 vs 20: 1x","Bust: 0x"],
+        crash:["Bust at 1.42x","Auto cashout 2.0x wins","Late cashout loses"],
+        dice:["Target 10: ~11x","Target 50: ~2x","Roll≥target: lose"],
+        plinko:["Center bin: ~1x","Edge bin: 3x","Miss: <1x"],
+        limbo:["Target 1.5x: frequent","Target 5x: rarer","Miss: 0x"],
+        mines:["3 picks, 3 bombs: high risk","3/3 safe picks: x~multiplier","Hit bomb: 0x"]
+      };
+      const arr = map[k] || ["House edge ~ "+e, "Wins depend on luck", "Play responsibly"];
+      const ul=document.getElementById('gpExamples'); ul.innerHTML=''; arr.forEach(t=>{ const li=document.createElement('li'); li.textContent=t; ul.appendChild(li); });
+    }
+
+    function renderPlayForm(k){
+      const cfg = gameConfig[k];
+      const form = document.getElementById('playForm');
+      const resEl = document.getElementById('playResult');
+      if(!cfg){ form.innerHTML = '<p>This game uses our classic table UI. <a href="/">Open main app</a>.</p>'; return; }
+      const fields = cfg.fields.map(f => {
+        if(f.type==='select'){
+          const opts=(f.options||[]).map(o=>`<option value="${o.v}">${o.t}</option>`).join('');
+          return `<div class='form-row'><label>${f.label}</label><select id='fld_${f.id}'>${opts}</select></div>`;
+        }
+        return `<div class='form-row'><label>${f.label}</label><input type='number' id='fld_${f.id}' min='${f.min??''}' max='${f.max??''}' step='${f.step??'1'}' value='${f.val??''}' /></div>`;
+      }).join('');
+      form.innerHTML = fields + `<button class='btn' id='playBtn'>Play</button>`;
+      const playBtn=document.getElementById('playBtn');
+      playBtn.addEventListener('click', async ()=>{
+        resEl.textContent=''; resEl.className='win-message';
+        const values = Object.fromEntries(cfg.fields.map(f=>[f.id, f.type==='select'? document.getElementById('fld_'+f.id).value : parseFloat(document.getElementById('fld_'+f.id).value)]));
+        try{
+          const res = await cfg.play(values);
+          if(res.balance!=null) {
+            const won = (res.winAmount||0) > 0;
+            resEl.textContent = won ? `You won $${res.winAmount}` : (res.outcome?`Outcome: ${res.outcome}`:'Done');
+            resEl.className = 'win-message ' + (won?'win':'');
+            try{ addHistory(k, { t: Date.now(), win: res.winAmount||0, outcome: res.outcome||'' }); renderHistory(k); }catch(_){ }
+          } else {
+            resEl.textContent = 'Action completed.';
+          }
+        } catch(e){
+          resEl.textContent = e.message || 'Play failed';
+          resEl.className = 'win-message lose';
+        }
+      });
+    }
+
+    function renderCharts(rtp, edge){
+      const r = Number.isFinite(rtp)? Math.max(0, Math.min(100, rtp)) : 0;
+      const fill=document.getElementById('rtpFill'); if(fill) fill.style.width = r + '%';
+      const e = Number(edge);
+      const risk = Number.isFinite(e)? (e<=0.01?'Low':e<=0.02?'Medium':'High') : '—';
+      const label=document.getElementById('volLabel'); if(label) label.textContent=risk;
+      const needle=document.getElementById('volNeedle');
+      if(needle){
+        // Map risk tier to angle (low: -40deg, med: 0deg, high: 40deg)
+        const angle = Number.isFinite(e) ? (e<=0.01?-40: e<=0.02?0:40) : 0;
+        needle.style.transform = `translate(-50%, -100%) rotate(${angle}deg)`;
+      }
+    }
+
+    function getHistKey(k){ return 'game:history:'+k; }
+    function addHistory(k, item){ try{ const raw=localStorage.getItem(getHistKey(k)); const arr=raw?JSON.parse(raw):[]; arr.unshift(item); localStorage.setItem(getHistKey(k), JSON.stringify(arr.slice(0,12))); }catch(_){}}
+    function renderHistory(k){ const ul=document.getElementById('gpHistory'); if(!ul) return; try{ const raw=localStorage.getItem(getHistKey(k)); const arr=raw?JSON.parse(raw):[]; if(!arr.length){ ul.innerHTML='<li class="history-empty">No history yet. Play a round!</li>'; } else { ul.innerHTML = arr.map(i=>{ const d=new Date(i.t); const win=i.win||0; const tag=win>0?`<span class='hist-win'>+$${win}</span>`:`<span class='hist-lose'>$0</span>`; return `<li><span>${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span> ${tag} ${i.outcome?`<small>(${i.outcome})</small>`:''}</li>`; }).join(''); } const clr=document.getElementById('clearHistory'); if(clr){ clr.onclick=()=>{ localStorage.removeItem(getHistKey(k)); renderHistory(k); }; } }catch(_){ ul.innerHTML='<li class="history-empty">History unavailable</li>'; }}
+
+    function wireNextPrev(currentKey, category){
+      if(!Array.isArray(allGamesCache)||!allGamesCache.length) return;
+      const list = allGamesCache.filter(g=>g.category===category);
+      const idx = list.findIndex(g=>g.key===currentKey);
+      const prev = list[(idx-1+list.length)%list.length];
+      const next = list[(idx+1)%list.length];
+      const prevA=document.getElementById('prevGame'); const nextA=document.getElementById('nextGame');
+      if(prevA&&prev){ prevA.href = `/games/${encodeURIComponent(prev.key)}/`; prevA.title=prev.name; }
+      if(nextA&&next){ nextA.href = `/games/${encodeURIComponent(next.key)}/`; nextA.title=next.name; }
+    }
+
+    loadDetails().catch(()=>{ document.getElementById('gpDesc').textContent='Failed to load game.'; });
+  </script>
+</body>
+</html>

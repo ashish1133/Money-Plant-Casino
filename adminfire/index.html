@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Casino Admin (Firebase)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <script>
+    try{ if(localStorage.getItem('perf:mode')==='1'){ document.documentElement.classList.add('perf-mode'); } }catch(_){ }
+  </script>
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body>
+  <header>
+    <h1>Casino Admin (Firebase Realtime)</h1>
+    <p class="warn">Requires Firebase Auth login and admin claim. Firestore reads occur client-side and must be permitted by Security Rules.</p>
+    <div id="adminStatus" class="warn"></div>
+  </header>
+  <main>
+    <section class="card">
+      <h2>Users <small id="users-count"></small></h2>
+      <table id="users-table">
+        <thead>
+          <tr><th>ID</th><th>Email</th><th>Name</th><th>Balance</th><th>Total Deposited</th><th>Total Won</th><th>Total Lost</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+    <section class="card">
+      <h2>Recent Transactions</h2>
+      <table id="tx-table">
+        <thead>
+          <tr><th>User</th><th>Type</th><th>Amount</th><th>Balance After</th><th>Time</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+    <section class="card">
+      <h2>Recent Game Plays</h2>
+      <table id="plays-table">
+        <thead>
+          <tr><th>User</th><th>Game</th><th>Bet</th><th>Win</th><th>Profit</th><th>Outcome</th><th>Time</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+  <script type="module" src="/firebase-init.js"></script>
+  <script type="module" src="/adminfire/panel.js"></script>
+</body>
+</html>

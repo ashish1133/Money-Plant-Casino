@@ -1,0 +1,57 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users: user can read/write own doc; admins can read all
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    // Registration records: user can read/write own record; admins can read all
+    match /register_users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    // Alternate spelling used by app: registure_users
+    match /registure_users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && request.auth.token.admin == true;
+    }
+    // Singular variant for debugging or legacy
+    match /register_user/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && request.auth.token.admin == true;
+    }
+    match /transactions/{docId} {
+      allow create: if request.auth != null;
+      // Owner can read own transactions if userId matches
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      // Admin can read all
+      allow read: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    match /gamePlays/{docId} {
+      allow create: if request.auth != null;
+      // Owner can read own game plays
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      // Admin can read all
+      allow read: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    // Optional: login events collections (admin only)
+    match /user_login_events/{docId} {
+      allow read: if request.auth != null && request.auth.token.admin == true;
+      allow create: if request.auth != null;
+    }
+    match /admin_login_events/{docId} {
+      allow read: if request.auth != null && request.auth.token.admin == true;
+      allow create: if request.auth != null && request.auth.token.admin == true;
+    }
+    match /admins/{docId} {
+      allow read: if request.auth != null && request.auth.token.admin == true;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+  }
+}

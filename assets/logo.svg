@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Lucky Casino logo">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFD700"/>
+      <stop offset="50%" stop-color="#FFB300"/>
+      <stop offset="100%" stop-color="#FFE869"/>
+    </linearGradient>
+    <radialGradient id="g2" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.9)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+  </defs>
+  <rect width="256" height="256" rx="28" fill="#0b0f1e"/>
+  <circle cx="128" cy="128" r="84" fill="url(#g1)"/>
+  <circle cx="128" cy="128" r="70" fill="#0b0f1e"/>
+  <g fill="none" stroke="url(#g1)" stroke-width="8" opacity="0.6">
+    <circle cx="128" cy="128" r="96"/>
+    <circle cx="128" cy="128" r="108" opacity="0.35"/>
+  </g>
+  <g transform="translate(128 128)">
+    <g transform="translate(-48 -48)">
+      <rect x="8" y="16" width="80" height="64" rx="8" fill="#12182a" stroke="url(#g1)" stroke-width="4"/>
+      <circle cx="48" cy="48" r="12" fill="url(#g1)"/>
+      <circle cx="28" cy="48" r="6" fill="#ff3366"/>
+      <circle cx="68" cy="48" r="6" fill="#00ffc8"/>
+    </g>
+  </g>
+  <circle cx="128" cy="88" r="70" fill="url(#g2)" opacity="0.25"/>
+</svg>
