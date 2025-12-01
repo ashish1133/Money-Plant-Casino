@@ -20,6 +20,7 @@ try {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+  try { window.__firebaseProjectId = app?.options?.projectId || null; } catch(_) {}
 
   // Resolve collection to store registration records
   let REGISTER_COLLECTION = 'registure_users';
@@ -31,6 +32,7 @@ try {
       if (meta && meta.content) REGISTER_COLLECTION = meta.content.trim();
     }
   } catch(_) {}
+  try { window.__registerCollection = REGISTER_COLLECTION; } catch(_) {}
   async function ensureUserDoc(user, extra={}){
     if(!user) return;
     const userDoc = doc(db, 'users', user.uid);
@@ -68,6 +70,7 @@ try {
       await setDoc(regDoc, payload, { merge: true });
     } catch (e) {
       console.warn('Registration record failed:', e?.message || e);
+      try { window.__registrationLastError = e?.message || String(e); } catch(_) {}
     }
   }
   // Expose helpers for the app to use
@@ -135,6 +138,7 @@ try {
       return snap.exists() ? { id: u.uid, ...snap.data() } : null;
     } catch (e) {
       console.warn('Fetch registration doc failed:', e?.message || e);
+      try { window.__registrationLastError = e?.message || String(e); } catch(_) {}
       return null;
     }
   };

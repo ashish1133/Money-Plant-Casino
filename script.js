@@ -222,6 +222,23 @@ async function renderRegistrationDetails(){
 					} finally { btn.disabled=false; btn.textContent=prev; }
 				};
 			}
+			// Show quick diagnostics to help fix environment issues
+			try {
+				const diag = document.createElement('div');
+				diag.className = 'full note';
+				const proj = window.__firebaseProjectId || 'unknown';
+				const col = window.__registerCollection || 'registure_users';
+				const err = window.__registrationLastError || '—';
+				diag.innerHTML = `
+				  <div style="margin-top:8px; padding:8px; border:1px dashed var(--border,#24304a); border-radius:8px;">
+				    <div><strong>Diagnostics</strong></div>
+				    <div>Project: <code>${proj}</code></div>
+				    <div>Collection: <code>${col}</code></div>
+				    <div>Auth: <code>${apiClient.isAuthenticated() ? 'signed-in' : 'signed-out'}</code></div>
+				    <div>Last Error: <code>${err}</code></div>
+				  </div>`;
+				container.appendChild(diag);
+			} catch(_){ }
 			return;
 		}
 		const fmt = (ts)=>{
