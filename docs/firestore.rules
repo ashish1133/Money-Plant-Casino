@@ -20,14 +20,18 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.token.admin == true;
     }
     match /transactions/{docId} {
-      // Create allowed for authenticated users (writes are from server via Admin SDK in this app)
       allow create: if request.auth != null;
-      // Only admins can read all transactions
+      // Owner can read own transactions if userId matches
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      // Admin can read all
       allow read: if request.auth != null && request.auth.token.admin == true;
     }
 
     match /gamePlays/{docId} {
       allow create: if request.auth != null;
+      // Owner can read own game plays
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      // Admin can read all
       allow read: if request.auth != null && request.auth.token.admin == true;
     }
 

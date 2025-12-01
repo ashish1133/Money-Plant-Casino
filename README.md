@@ -71,8 +71,26 @@ service cloud.firestore {
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | (Auth handled by Firebase) |  | Attach `Authorization: Bearer <Firebase ID token>` |
-| `/api/wallet/deposit` | POST | Add funds |
-| `/api/wallet/withdraw` | POST | Remove funds |
+| `/api/wallet/deposit` | POST | Add funds (Express) or `walletDeposit` (Firebase Function) |
+| `/api/wallet/withdraw` | POST | Remove funds (Express) or `walletWithdraw` (Firebase Function) |
+## ☁️ Firebase Functions Backend (Experimental)
+- Location: `firebase/functions`
+- Endpoints:
+   - `usersProfile`: GET user profile from Firestore (requires Firebase ID token)
+   - `walletDeposit`: POST deposit and create a transaction in Firestore
+   - `walletWithdraw`: POST withdraw and create a transaction in Firestore
+- Deploy & emulate:
+   ```powershell
+   Push-Location "c:\Users\alaga\Downloads\Money-Plant-Casino-main\firebase\functions"
+   npm install
+   # Emulate locally (requires Firebase CLI):
+   firebase emulators:start --only functions,firestore
+   # Deploy to Firebase project:
+   firebase deploy --only functions
+   ```
+- Update frontend to call functions:
+   - Add `<meta name="api-base" content="https://us-central1-<project-id>.cloudfunctions.net">` and map endpoints accordingly
+   - Or adjust `api-client.js` to use the Functions base URL
 | `/api/wallet/transactions` | GET | Paginated transaction list |
 | `/api/games/slots` | POST | Play slots round |
 | `/api/games/roulette` | POST | Play roulette round |

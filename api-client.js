@@ -7,6 +7,7 @@
 // This allows the same bundled frontend to work on GitHub Pages (with a deployed backend)
 // or when served directly by the Express server.
 let API_BASE_URL = 'http://localhost:3000/api';
+let IS_FIREBASE_FUNCTIONS = false;
 try {
     if (typeof window !== 'undefined') {
         if (window.API_BASE_URL) {
@@ -20,9 +21,27 @@ try {
                 API_BASE_URL = window.location.origin.replace(/\/$/, '') + '/api';
             }
         }
+        IS_FIREBASE_FUNCTIONS = /cloudfunctions\.net/.test(API_BASE_URL);
     }
 } catch (e) {
     console.warn('API base URL auto-detect failed, using default', e);
+}
+
+function makeUrl(endpoint){
+    // If using Firebase Functions, endpoints are function names at root
+    if (IS_FIREBASE_FUNCTIONS) {
+        // Map known endpoints
+        switch(endpoint){
+            case '/users/profile': return API_BASE_URL.replace(/\/$/,'') + '/usersProfile';
+            case '/wallet/deposit': return API_BASE_URL.replace(/\/$/,'') + '/walletDeposit';
+            case '/wallet/withdraw': return API_BASE_URL.replace(/\/$/,'') + '/walletWithdraw';
+            default:
+                // Fallback: strip leading '/api' and slashes -> function name
+                return API_BASE_URL.replace(/\/$/,'') + '/' + endpoint.replace(/^\/?(api\/)?/,'').replace(/\//g,'_');
+        }
+    }
+    // Express-style
+    return API_BASE_URL.replace(/\/$/,'') + endpoint;
 }
 
 class APIClient {
@@ -51,7 +70,7 @@ class APIClient {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+            const response = await fetch(makeUrl(endpoint), config);
 
             // If unauthorized, surface error (Firebase token missing/invalid)
             if (response.status === 401) {
