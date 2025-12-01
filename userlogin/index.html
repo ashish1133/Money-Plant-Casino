@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User Login & Registration</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    .auth-page { max-width: 720px; margin: 60px auto; background: var(--card-bg, #0b0f1a); border-radius: 16px; padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+    .auth-header { display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; }
+    .auth-tabs { display:flex; gap:8px; }
+    .auth-tabs button { padding:10px 14px; border-radius:8px; border:1px solid var(--border, #24304a); background:#101827; color:#e2e8f0; cursor:pointer; }
+    .auth-tabs button.active { background:#1f2a44; border-color:#3b82f6; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .form-grid label { display:block; font-size:14px; margin-bottom:4px; color:#9aa5b1; }
+    .form-grid input, .form-grid select { width:100%; padding:12px; border-radius:8px; border:1px solid #24304a; background:#0f172a; color:#e2e8f0; }
+    .full { grid-column: 1 / -1; }
+    .actions { margin-top: 12px; display:flex; gap:10px; justify-content:flex-end; }
+    .note { margin-top:8px; color:#9aa5b1; font-size: 12px; }
+    .error { color:#ef4444; margin-top:8px; }
+    .success { color:#22c55e; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-header">
+      <h1>User Access</h1>
+      <div class="auth-tabs" role="tablist">
+        <button id="tab-login" class="active" role="tab" aria-selected="true">Login</button>
+        <button id="tab-signup" role="tab" aria-selected="false">Sign Up</button>
+      </div>
+    </div>
+
+    <form id="loginForm" class="form-grid" autocomplete="on" novalidate>
+      <div class="full">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" required autocomplete="email" />
+      </div>
+      <div class="full">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" required autocomplete="current-password" />
+      </div>
+      <div class="actions full">
+        <a class="btn btn-outline" href="/">Cancel</a>
+        <button type="submit" class="btn btn-primary">Login</button>
+      </div>
+      <div class="full" style="display:flex;gap:8px;align-items:center;justify-content:flex-end">
+        <button type="button" id="btnGoogleLogin" class="btn btn-outline">Continue with Google</button>
+        <button type="button" id="btnAppleLogin" class="btn btn-outline">Continue with Apple</button>
+      </div>
+      <div id="loginMessage" class="note full" aria-live="polite"></div>
+    </form>
+
+    <form id="signupForm" class="form-grid" style="display:none" autocomplete="on" novalidate>
+      <div>
+        <label for="signupName">Name</label>
+        <input type="text" id="signupName" required minlength="2" autocomplete="name" />
+      </div>
+      <div>
+        <label for="signupPhone">Phone Number</label>
+        <input type="tel" id="signupPhone" required autocomplete="tel" />
+      </div>
+      <div>
+        <label for="signupAge">Age</label>
+        <input type="number" id="signupAge" required min="18" max="120" autocomplete="bday" />
+      </div>
+      <div>
+        <label for="signupGender">Gender</label>
+        <select id="signupGender" required>
+          <option value="" disabled selected>Select gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+          <option value="prefer_not_say">Prefer not to say</option>
+        </select>
+      </div>
+      <div class="full">
+        <label for="signupEmail">Email</label>
+        <input type="email" id="signupEmail" required autocomplete="email" />
+      </div>
+      <div>
+        <label for="signupPassword">Password</label>
+        <input type="password" id="signupPassword" required minlength="6" autocomplete="new-password" />
+      </div>
+      <div>
+        <label for="signupConfirmPassword">Confirm Password</label>
+        <input type="password" id="signupConfirmPassword" required minlength="6" autocomplete="new-password" />
+      </div>
+      <div class="actions full">
+        <a class="btn btn-outline" href="/">Cancel</a>
+        <button type="submit" class="btn btn-primary">Create Account</button>
+      </div>
+      <div class="full" style="display:flex;gap:8px;align-items:center;justify-content:flex-end">
+        <button type="button" id="btnGoogleSignup" class="btn btn-outline">Sign up with Google</button>
+        <button type="button" id="btnAppleSignup" class="btn btn-outline">Sign up with Apple</button>
+      </div>
+      <div id="signupMessage" class="note full" aria-live="polite"></div>
+    </form>
+
+  </div>
+
+  <script type="module" src="/firebase-init.js"></script>
+  <script src="/api-client.js"></script>
+  <script>
+    (function(){
+      // Disable submit until Firebase auth is ready
+      const loginSubmit = document.querySelector('#loginForm button[type="submit"]');
+      const signupSubmit = document.querySelector('#signupForm button[type="submit"]');
+      const setDisabled=(d)=>{ if(loginSubmit) loginSubmit.disabled=d; if(signupSubmit) signupSubmit.disabled=d; };
+      setDisabled(true);
+      if (window.firebaseAuth) setDisabled(false); else window.addEventListener('firebase-ready', ()=>setDisabled(false), { once:true });
+
+      const tabLogin=document.getElementById('tab-login');
+      const tabSignup=document.getElementById('tab-signup');
+      const loginForm=document.getElementById('loginForm');
+      const signupForm=document.getElementById('signupForm');
+      const setTab=(t)=>{
+        const login=t==='login';
+        tabLogin.classList.toggle('active', login);
+        tabSignup.classList.toggle('active', !login);
+        tabLogin.setAttribute('aria-selected', String(login));
+        tabSignup.setAttribute('aria-selected', String(!login));
+        loginForm.style.display= login? 'grid':'none';
+        signupForm.style.display= login? 'none':'grid';
+      };
+      tabLogin.addEventListener('click',()=>setTab('login'));
+      tabSignup.addEventListener('click',()=>setTab('signup'));
+      try { const params=new URLSearchParams(window.location.search); if(params.get('signup')==='1'){ setTab('signup'); } } catch(_){}
+
+      loginForm.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const email=document.getElementById('loginEmail').value.trim();
+        const password=document.getElementById('loginPassword').value;
+        const msg=document.getElementById('loginMessage');
+        msg.className='note'; msg.textContent='';
+        try {
+          if(!window.firebaseLogin) throw new Error('Auth not ready');
+          await window.firebaseLogin(email, password);
+          msg.className='success'; msg.textContent='Login successful! Redirecting...';
+          setTimeout(()=>{ window.location.href='/'; }, 600);
+        } catch(err){ msg.className='error'; msg.textContent=err.message||'Login failed'; }
+      });
+
+      signupForm.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const name=document.getElementById('signupName').value.trim();
+        const phone=document.getElementById('signupPhone').value.trim();
+        const age=parseInt(document.getElementById('signupAge').value,10);
+        const gender=document.getElementById('signupGender').value;
+        const email=document.getElementById('signupEmail').value.trim();
+        const password=document.getElementById('signupPassword').value;
+        const confirm=document.getElementById('signupConfirmPassword').value;
+        const msg=document.getElementById('signupMessage');
+        msg.className='note'; msg.textContent='';
+        if(password!==confirm){ msg.className='error'; msg.textContent='Passwords do not match'; return; }
+        if(!Number.isFinite(age)||age<18){ msg.className='error'; msg.textContent='You must be 18 or older'; return; }
+        try {
+          if(window.firebaseSignupWithProfile){
+            await window.firebaseSignupWithProfile({ name, phone, age, gender, email, password });
+          } else if(window.firebaseSignup){
+            await window.firebaseSignup(email, password);
+          } else {
+            throw new Error('Auth not ready');
+          }
+          msg.className='success'; msg.textContent='Account created! Redirecting...';
+          setTimeout(()=>{ window.location.href='/'; }, 800);
+        } catch(err){ msg.className='error'; msg.textContent=err.message||'Signup failed'; }
+      });
+
+      async function social(provider){
+        const msgL=document.getElementById('loginMessage');
+        const msgS=document.getElementById('signupMessage');
+        try{
+          if(!window.firebaseSignInWithProvider) throw new Error('Auth not ready');
+          const u = await window.firebaseSignInWithProvider(provider);
+          ;(msgL||msgS).className='success';
+          ;(msgL||msgS).textContent='Signed in! Redirecting...';
+          setTimeout(()=>{ window.location.href='/'; }, 600);
+        }catch(err){
+          const target = (signupForm.style.display!=='none')? msgS : msgL;
+          if(target){ target.className='error'; target.textContent=err && err.message || 'Sign-in failed'; }
+        }
+      }
+      const gL=document.getElementById('btnGoogleLogin'); if(gL) gL.addEventListener('click',()=>social('google'));
+      const gS=document.getElementById('btnGoogleSignup'); if(gS) gS.addEventListener('click',()=>social('google'));
+      const aL=document.getElementById('btnAppleLogin'); if(aL) aL.addEventListener('click',()=>social('apple'));
+      const aS=document.getElementById('btnAppleSignup'); if(aS) aS.addEventListener('click',()=>social('apple'));
+    })();
+  </script>
+</body>
+</html>

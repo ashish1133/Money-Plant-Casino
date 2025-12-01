@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Category • Lucky Casino</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo" onclick="location.href='/'" style="cursor:pointer">
+        <img src="../assets/logo.svg" alt="Lucky Casino logo" width="28" height="28" class="logo-icon" />
+        <span class="logo-text">Lucky Casino</span>
+      </div>
+      <div></div>
+      <div class="user-section">
+        <a class="btn btn-outline" href="/">Home</a>
+        <a class="btn btn-outline" href="/userlogin/?signup=1">Register</a>
+        <a class="btn btn-primary" href="/index.html#catalog">All Games</a>
+      </div>
+    </div>
+  </nav>
+  <div style="height:72px"></div>
+
+  <main class="container" id="catPage">
+    <h1 class="section-title" id="catTitle">Category</h1>
+    <p class="section-subtitle">Browse games by category. Click a game to open its page.</p>
+
+    <div id="catGrid" class="catalog-grid" style="margin-top:16px"></div>
+  </main>
+
+  <script src="../api-client.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const cat = (params.get('category')||'').toLowerCase();
+
+    function icon(key){ return ({slots:'🎰', roulette:'🎲', blackjack:'🃏', crash:'✈️', dice:'🎯', plinko:'🔻', limbo:'💫', mines:'💣'})[key] || '🎮'; }
+
+    async function render(){
+      try{
+        const data = await apiClient.getGamesCatalog();
+        const cats = data.categories||[];
+        const category = cats.find(c => c.key === cat) || cats[0] || {title:'All', games:[]};
+        document.getElementById('catTitle').textContent = category.title || 'Category';
+        const list = (category.games||[]).map(g=>({ ...g, category: category.key }));
+        const container = document.getElementById('catGrid');
+        if(!list.length){ container.innerHTML = '<div class="empty-state">No games in this category.</div>'; return; }
+        container.innerHTML = `
+          <div class="catalog-category">
+            <h3>${category.title}</h3>
+            <div class="catalog-games">
+              ${list.map(g => `
+                <a class="catalog-game ${g.comingSoon?'soon':''}" title="${g.name}" href="/games/${encodeURIComponent(g.key)}/">
+                  <div class="catalog-icon">${icon(g.key)}</div>
+                  <div class="catalog-name">${g.name}</div>
+                  ${g.edge!=null?`<div class=\"catalog-meta\">edge ~ ${(g.edge*100).toFixed(1)}%</div>`:''}
+                  ${g.comingSoon?'<div class="catalog-tag">Soon</div>':''}
+                </a>
+              `).join('')}
+            </div>
+          </div>`;
+      }catch(e){
+        document.getElementById('catGrid').innerHTML = '<p>Failed to load category.</p>';
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>

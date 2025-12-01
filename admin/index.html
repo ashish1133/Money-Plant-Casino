@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Casino Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <header>
+    <h1>Casino Admin Dashboard</h1>
+    <p class="warn">Requires Firebase login with admin custom claim. Server endpoints are protected.</p>
+  </header>
+  <main>
+    <section id="overview" class="card">
+      <h2>Overview</h2>
+      <div class="grid" id="overview-stats"></div>
+    </section>
+    <section class="card">
+      <h2>Users <small id="users-count"></small></h2>
+      <table id="users-table">
+        <thead>
+          <tr><th>ID</th><th>Username</th><th>Email</th><th>Level</th><th>XP</th><th>Balance</th><th>Created</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+    <section class="card">
+      <h2>Recent Transactions</h2>
+      <table id="tx-table">
+        <thead>
+          <tr><th>ID</th><th>User</th><th>Type</th><th>Amount</th><th>Balance After</th><th>Time</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+    <section class="card">
+      <h2>Recent Game Results</h2>
+      <table id="games-table">
+        <thead>
+          <tr><th>ID</th><th>User</th><th>Game</th><th>Bet</th><th>Win</th><th>Profit</th><th>Outcome</th><th>Time</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+    <section class="card">
+      <h2>KYC Reviews</h2>
+      <p>Approve or reject pending KYC profiles.</p>
+      <table id="kyc-table">
+        <thead>
+          <tr><th>User ID</th><th>Name</th><th>DOB</th><th>Country</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+  <script type="module" src="/firebase-init.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
