@@ -518,11 +518,11 @@ body.nav-menu-open {
     .nav-container { position: relative; grid-template-columns: 1fr auto; grid-template-areas: 'logo actions' 'links links'; row-gap: 0.5rem; }
     .nav-links {
         position: fixed;
-        top: 60px;
+        top: 52px;
         right: 0;
         width: 260px;
         max-width: 85vw;
-        height: calc(100vh - 60px);
+        height: calc(100vh - 52px);
         padding: 1rem;
         display: flex;
         flex-direction: column;
@@ -540,7 +540,7 @@ body.nav-menu-open {
 .nav-link, .nav-btn {
     align-items: center;
     display: inline-flex;
-    padding: 0.35rem 0.25rem;
+    padding: 0.28rem 0.2rem;
 }
 .nav-link:hover::before {
     content: '';
@@ -555,7 +555,7 @@ body.nav-menu-open {
 /* Mobile menu visual polish */
 @media (max-width: 1024px) {
     .nav-links a, .nav-links .nav-btn {
-        padding: 0.6rem 0.75rem;
+        padding: 0.52rem 0.65rem;
         border-radius: 10px;
         border: 1px solid rgba(255,255,255,0.06);
         background: rgba(255,255,255,0.03);
@@ -655,7 +655,7 @@ body.nav-menu-open {
 /* --- Compact Header Overrides (non-destructive) --- */
 .navbar { padding: 0.7rem 0; box-shadow: var(--shadow-sm); }
 .navbar.nav-shrink { padding: 0.5rem 0; }
-.nav-container { column-gap: 0.75rem; }
+.nav-container { column-gap: 0.5rem; }
 .logo { font-size: 1.3rem; gap: 10px; filter: drop-shadow(0 0 5px rgba(255,215,0,0.22)); }
 .logo-icon { font-size: 1.6rem; }
 .user-section { gap: 0.9rem; }
@@ -665,14 +665,14 @@ body.nav-menu-open {
 @media (max-width:1024px){ .user-section { gap: 0.45rem; } }
 
 /* Further Compact Header Adjustments */
-.navbar { padding: 0.5rem 0; }
-.navbar.nav-shrink { padding: 0.3rem 0; }
-.logo { font-size: 1.1rem; gap: 8px; }
-.logo-icon { font-size: 1.4rem; }
-.user-section { gap: 0.6rem; }
-.icon-btn { padding: 0.32rem 0.6rem; font-size: 0.78rem; }
-.balance { padding: 0.4rem 0.7rem; gap: 0.3rem; }
-.balance-amount { font-size: 0.95rem; min-width: 80px; }
+.navbar { padding: 0.38rem 0; }
+.navbar.nav-shrink { padding: 0.22rem 0; }
+.logo { font-size: 1.0rem; gap: 6px; }
+.logo-icon { font-size: 1.2rem; }
+.user-section { gap: 0.5rem; }
+.icon-btn { padding: 0.26rem 0.5rem; font-size: 0.74rem; }
+.balance { padding: 0.32rem 0.6rem; gap: 0.25rem; }
+.balance-amount { font-size: 0.9rem; min-width: 72px; }
 
 /* User Profile */
 .user-profile {
@@ -721,7 +721,7 @@ body.nav-menu-open {
 
 /* Ensure consistent alignment for login/deposit/withdraw/balance in navbar */
 .navbar .user-section {
-    gap: 0.75rem;
+    gap: 0.55rem;
 }
 .navbar .user-section .btn-primary#loginBtn {
     margin-left: auto;
@@ -737,7 +737,7 @@ body.nav-menu-open {
 /* Compact layout on smaller screens: stack neatly */
 @media (max-width: 768px) {
     .navbar .nav-container {
-        gap: 0.75rem;
+        gap: 0.6rem;
     }
     .navbar .user-section {
         width: 100%;
@@ -756,7 +756,7 @@ body.nav-menu-open {
         order: 3;
     }
     .navbar .user-section .balance-amount { min-width: unset; text-align: left; }
-    .navbar .user-section .icon-btn { padding: 0.5rem 0.8rem; }
+    .navbar .user-section .icon-btn { padding: 0.42rem 0.7rem; }
 }
 
 /* Align hero buttons (home screen) consistently */
@@ -784,7 +784,7 @@ body.nav-menu-open {
 /* Notification System */
 .notification-container {
     position: fixed;
-    top: 64px;
+    top: 56px;
     right: 20px;
     z-index: 3000;
     display: flex;
