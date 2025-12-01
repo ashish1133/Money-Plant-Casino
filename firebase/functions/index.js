@@ -321,9 +321,11 @@ exports.gamesVerify = functions.https.onRequest(async (req, res) => {
   try {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
     const { seed, hash } = req.body || {};
-    // For our stub RNG, we just echo seed==hash as valid
-    const valid = !!seed && seed === hash;
-    return res.json({ valid });
+    if (!seed || !hash) return res.status(400).json({ error: 'seed and hash required' });
+    const crypto = require('crypto');
+    const computed = crypto.createHash('sha256').update(String(seed)).digest('hex');
+    const valid = computed === String(hash);
+    return res.json({ valid, computed });
   } catch (e) {
     return res.status(500).json({ error: e.message || 'Internal error' });
   }
