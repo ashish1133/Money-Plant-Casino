@@ -46,7 +46,7 @@ function initNavToggle(){ const toggle=document.getElementById('navToggle'); con
 function scrollToGames(){ const gamesSection=document.getElementById('games'); if(gamesSection) gamesSection.scrollIntoView({ behavior:'smooth', block:'start' }); }
 function initFinanceButtons(){ const dep=document.getElementById('depositBtn'); const wit=document.getElementById('withdrawBtn'); if(dep) dep.addEventListener('click',()=>openFinance('deposit')); if(wit) wit.addEventListener('click',()=>openFinance('withdraw')); }
 function initModalTriggers(){ document.querySelectorAll('[data-modal]').forEach(btn=>btn.addEventListener('click',()=>openGenericModal(btn.dataset.modal))); document.querySelectorAll('.close[data-close]').forEach(c=>c.addEventListener('click',()=>closeGenericModal(c.dataset.close))); }
-function openGenericModal(id){ const m=document.getElementById(id); if(!m) return; m.style.display='block'; m.classList.add('fade-in'); const c=m.querySelector('.modal-content'); if(c) c.classList.add('scale-in'); document.body.style.overflow='hidden'; m.setAttribute('aria-hidden','false'); previousFocus=document.activeElement; trapFocus(m); focusFirstInput(m); if(id==='achievementsModal') renderAchievements(); if(id==='leaderboardModal') renderLeaderboard('profit'); if(id==='statsModal') renderStats(); }
+function openGenericModal(id){ const m=document.getElementById(id); if(!m) return; m.style.display='block'; m.classList.add('fade-in'); const c=m.querySelector('.modal-content'); if(c) c.classList.add('scale-in'); document.body.style.overflow='hidden'; m.setAttribute('aria-hidden','false'); previousFocus=document.activeElement; trapFocus(m); focusFirstInput(m); if(id==='achievementsModal') renderAchievements(); if(id==='leaderboardModal') renderLeaderboard('profit'); if(id==='statsModal') renderStats(); if(id==='registrationModal') renderRegistrationDetails(); }
 function closeGenericModal(id){ const m=document.getElementById(id); if(!m) return; m.style.display='none'; document.body.style.overflow='auto'; m.setAttribute('aria-hidden','true'); releaseFocus(); }
 function updateActiveNav(){ const sections=document.querySelectorAll('section[id]'); const navLinks=document.querySelectorAll('.nav-link'); let current=''; sections.forEach(s=>{ if(window.pageYOffset>=s.offsetTop-200) current=s.id; }); navLinks.forEach(l=>{ l.classList.remove('active'); if(l.getAttribute('href')===`#${current}`) l.classList.add('active'); }); const nav=document.querySelector('.navbar'); if(nav){ if(window.scrollY>50) nav.classList.add('nav-shrink'); else nav.classList.remove('nav-shrink'); }}
 function updateBalance(){ const el=document.getElementById('balance'); if(el) el.textContent=`$${balance.toLocaleString()}`; }
@@ -187,6 +187,46 @@ function unlockAchievement(id,title,description){ showNotification(`🏆 ${title
 function checkDailyBonus(){}
 async function initDailyBonusUI(){ const btn=document.getElementById('claimDailyBonusBtn'); if(!btn) return; btn.disabled=true; if(!apiClient.isAuthenticated()||!currentUser){ btn.textContent='Login for Bonus'; return;} try { const profile=await apiClient.getProfile(); const streak=profile.streak||{current_streak:0}; const lastClaim=profile.user.last_bonus_claim||0; const now=Date.now(); const oneDayMs=86400000; if(now-lastClaim>=oneDayMs){ const bonusBase=500+Math.min(streak.current_streak*50,500); btn.textContent=`Claim $${bonusBase}`; btn.disabled=false; btn.onclick= async ()=>{ btn.disabled=true; showLoader(); try { const res=await apiClient.claimDailyBonus(); balance=res.balance; updateBalance(); showNotification('Bonus Claimed',`You received $${res.amount}`,'success'); createConfetti(); } catch(err){ showNotification('Bonus Error',err.message||'Failed','error'); } finally { hideLoader(); initDailyBonusUI(); } }; } else { const remaining=oneDayMs-(now-lastClaim); const hrs=Math.floor(remaining/3600000); const mins=Math.floor((remaining%3600000)/60000); btn.textContent=`Next in ${hrs}h ${mins}m`; } } catch(e){ btn.textContent='Bonus unavailable'; }}
 async function renderAchievements(){ const grid=document.getElementById('achievementsGrid'); if(!grid) return; grid.innerHTML=''; if(!apiClient.isAuthenticated()){ grid.innerHTML='<p style="text-align:center;color:var(--text-gray)">Login to view achievements.</p>'; return;} try { const data=await apiClient.getAchievements(); const list=data.achievements||[]; if(!list.length){ grid.innerHTML='<p style="text-align:center;color:var(--text-gray)">No achievements yet.</p>'; return;} list.forEach(a=>{ const d=new Date(a.unlocked_at||Date.now()); const el=document.createElement('div'); el.className='achievement-card unlocked'; el.innerHTML=`<div class='achievement-icon'>🏆</div><div class='achievement-title'>${a.title}</div><div class='achievement-desc'>${a.description}</div><div class='achievement-date'>${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>`; grid.appendChild(el); }); } catch(e){ grid.innerHTML='<p style="text-align:center;color:var(--text-gray)">Failed to load achievements.</p>'; }}
+
+async function renderRegistrationDetails(){
+	const container = document.getElementById('registrationBody');
+	const status = document.getElementById('registrationStatus');
+	if(!container) return;
+	if(status) { status.textContent = 'Loading…'; status.className = 'full'; }
+	try{
+		if(!apiClient.isAuthenticated()){
+			if(status) status.textContent = 'Please login to view your registration.';
+			return;
+		}
+		if(typeof window.getRegistrationDoc !== 'function'){
+			if(status) status.textContent = 'Registration details unavailable.';
+			return;
+		}
+		const data = await window.getRegistrationDoc();
+		if(!data){
+			if(status) status.textContent = 'No registration document found.';
+			return;
+		}
+		const fmt = (ts)=>{
+			try{ if(ts && typeof ts.toDate === 'function') return ts.toDate().toLocaleString(); }catch(_){}
+			return ts || '—';
+		};
+		container.innerHTML = `
+			<div><label class="note">UID</label><div class="stat-value" style="word-break:break-all">${data.uid||data.id||'—'}</div></div>
+			<div><label class="note">Email</label><div class="stat-value">${data.email||'—'}</div></div>
+			<div><label class="note">Name</label><div class="stat-value">${data.name||'—'}</div></div>
+			<div><label class="note">Phone</label><div class="stat-value">${data.phone||'—'}</div></div>
+			<div><label class="note">Age</label><div class="stat-value">${Number.isFinite(data.age)?data.age:'—'}</div></div>
+			<div><label class="note">Gender</label><div class="stat-value">${data.gender||'—'}</div></div>
+			<div><label class="note">Provider</label><div class="stat-value">${data.provider||'—'}</div></div>
+			<div><label class="note">Created</label><div class="stat-value">${fmt(data.createdAt)}</div></div>
+			<div><label class="note">Updated</label><div class="stat-value">${fmt(data.updatedAt)}</div></div>
+			<div class="full note">These details are stored in Firestore collection <code>registure_users</code>.</div>
+		`;
+	} catch(e){
+		if(status) status.textContent = 'Failed to load registration details.';
+	}
+}
 async function renderLeaderboard(type){ const list=document.getElementById('leaderboardList'); if(!list) return; list.innerHTML='Loading...'; try { const isGame=['slots','roulette','blackjack'].includes(type); const data=await apiClient.getLeaderboard(isGame?'profit':type,isGame?type:null,10); const lb=data.leaderboard||[]; list.innerHTML=''; lb.forEach((row,idx)=>{ const li=document.createElement('li'); const scoreVal=row.net_profit!==undefined?('$'+row.net_profit.toLocaleString()):row.level!==undefined?('Lvl '+row.level):('$'+(row.profit||0).toLocaleString()); li.innerHTML=`<span class='leaderboard-rank'>#${idx+1}</span><span class='leaderboard-name'>${row.username||'Player'}</span><span class='leaderboard-score'>${scoreVal}</span>`; list.appendChild(li); }); } catch(e){ list.innerHTML='<li>Failed to load leaderboard</li>'; } document.querySelectorAll('.leaderboard-tab').forEach(tab=>{ tab.classList.remove('active'); if(tab.dataset.lbType===type) tab.classList.add('active'); tab.onclick=()=>renderLeaderboard(tab.dataset.lbType); }); }
 async function renderStats(){ const grid=document.getElementById('statsGrid'); if(!grid) return; grid.innerHTML=''; if(!apiClient.isAuthenticated()){ grid.innerHTML='<p style="text-align:center;color:var(--text-gray)">Login to view stats.</p>'; return;} try { const data=await apiClient.getStats(); const s=data.stats||{}; const breakdown=data.gameBreakdown||[]; const core=[{label:'Total Games',value:s.total_games||0},{label:'Wins',value:s.total_wins||0},{label:'Win Rate',value:(s.winRate||0)+'%'},{label:'Net Profit',value:'$'+(s.net_profit||0).toLocaleString()},{label:'Biggest Win',value:'$'+(s.biggest_win||0).toLocaleString()},{label:'Avg Bet',value:'$'+(Math.round(s.avg_bet)||0).toLocaleString()}]; core.forEach(d=>{ const card=document.createElement('div'); card.className='stat-card'; card.innerHTML=`<div class='stat-label'>${d.label}</div><div class='stat-value'>${d.value}</div>`; grid.appendChild(card); }); breakdown.forEach(gb=>{ const card=document.createElement('div'); card.className='stat-card'; card.innerHTML=`<div class='stat-label'>${gb.game} plays</div><div class='stat-value'>${gb.plays} (Wins: ${gb.wins})</div>`; grid.appendChild(card); }); updateXPBar(); } catch(e){ grid.innerHTML='<p style="text-align:center;color:var(--text-gray)">Failed to load stats.</p>'; }}
 function updateXPBar(){ if(!currentUser) return; const xpFill=document.getElementById('xpFill'); const xpValue=document.getElementById('xpValue'); if(!xpFill||!xpValue) return; const xp=currentUser.xp||0; const level=currentUser.level||1; const base=(level-1)*1000; const progress=xp-base; const pct=Math.min(100,(progress/1000)*100); xpFill.style.width=pct+'%'; xpValue.textContent=`${progress} / 1000`; }

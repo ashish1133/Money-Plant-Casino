@@ -4,7 +4,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
 import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile, GoogleAuthProvider, OAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBf5mkzvmzWu0-sdwbuLnwxnNXNFLqO8N4",
@@ -118,6 +118,19 @@ try {
     const u = auth.currentUser;
     if (!u) return null;
     return await u.getIdToken(/* forceRefresh */ true);
+  };
+
+  // Expose registration fetch helper for UI
+  window.getRegistrationDoc = async () => {
+    try {
+      const u = auth.currentUser;
+      if (!u) return null;
+      const snap = await getDoc(doc(db, REGISTER_COLLECTION, u.uid));
+      return snap.exists() ? { id: u.uid, ...snap.data() } : null;
+    } catch (e) {
+      console.warn('Fetch registration doc failed:', e?.message || e);
+      return null;
+    }
   };
 
   const supported = await isSupported();
