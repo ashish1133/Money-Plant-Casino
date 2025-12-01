@@ -23,14 +23,15 @@ async function main() {
     const projectId = db._settings?.projectId || process.env.FIREBASE_PROJECT_ID || 'unknown';
     console.log('[INFO] Connected to project:', projectId);
 
+    const collectionName = process.env.REGISTER_COLLECTION || 'registure_users';
     const testId = `debug-${Date.now()}`;
-    const docRef = db.collection('registure_users').doc(testId);
+    const docRef = db.collection(collectionName).doc(testId);
     await docRef.set({
       uid: testId,
       createdAt: Date.now(),
       diagnostics: 'temporary debug write'
     });
-    console.log('[PASS] Write succeeded to collection registure_users.');
+    console.log(`[PASS] Write succeeded to collection ${collectionName}.`);
 
     const snap = await docRef.get();
     if (!snap.exists) {
