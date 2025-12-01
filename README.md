@@ -36,6 +36,22 @@ An end‑to‑end demo casino platform: rich animated frontend + Node.js/Express
 - Structured logging (Winston) & error handling
 - Progression and achievement unlocking integrated into game results
 
+## 🗂 Firestore Registration Mirroring
+- On signup, login, and social sign-in, the app writes a registration document to Firestore in collection `registure_users` with fields: `uid, email, name, phone, age, gender, provider, createdAt, updatedAt`.
+- Collection can be overridden via `<meta name="register-collection" content="...">` (set in `userlogin/index.html`). Default is `registure_users`.
+- Rules (publish in Firebase Console → Firestore → Rules):
+```rules
+rules_version = '2';
+service cloud.firestore {
+   match /databases/{database}/documents {
+      match /registure_users/{userId} {
+         allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+   }
+}
+```
+- UI: After login, click “My Registration” in the header to view your doc.
+
 ## 🌐 API Overview (High Level)
 | Endpoint | Method | Description |
 |----------|--------|-------------|
