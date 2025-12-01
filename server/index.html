@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Casino - Premium Gaming Experience</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🎰</span>
+                <span class="logo-text">Lucky Casino</span>
+            </div>
+            <button class="nav-toggle" id="navToggle" type="button" aria-label="Toggle navigation" aria-controls="primaryNav" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="nav-links" id="primaryNav">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#games" class="nav-link">Games</a>
+                <button class="nav-link nav-btn" type="button" data-modal="leaderboardModal">Leaderboard</button>
+                <button class="nav-link nav-btn" type="button" data-modal="achievementsModal">Achievements</button>
+                <button class="nav-link nav-btn" type="button" data-modal="statsModal">Stats</button>
+                <a href="#promotions" class="nav-link">Promotions</a>
+                <a href="#about" class="nav-link">About</a>
+            </div>
+            <div class="user-section">
+                <div class="toggle-group">
+                    <button id="depositBtn" class="icon-btn" aria-label="Open deposit dialog">➕ Deposit</button>
+                    <button id="withdrawBtn" class="icon-btn" aria-label="Open withdrawal dialog">➖ Withdraw</button>
+                </div>
+                <div class="balance">
+                    <span class="balance-label">Balance:</span>
+                    <span class="balance-amount" id="balance">$10,000</span>
+                </div>
+                <div class="user-profile" id="userProfile" style="display:none;">
+                    <div class="user-avatar" id="userAvatar">👤</div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName">Player</div>
+                        <div class="user-level" id="userLevel">Level 1</div>
+                    </div>
+                    <button class="btn btn-outline btn-small" id="logoutBtn">Logout</button>
+                </div>
+                <button class="btn btn-primary" id="loginBtn">Login</button>
+            </div>
+        </div>
+    </nav>
+    <div class="nav-overlay" id="navOverlay" aria-hidden="true"></div>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero reveal" aria-labelledby="hero-heading">
+        <div class="floating-chip chip-1"></div>
+        <div class="floating-chip chip-2"></div>
+        <div class="floating-chip chip-3"></div>
+        <div class="hero-particles"></div>
+        <div class="hero-grid">
+            <div class="hero-content">
+                <h1 id="hero-heading" class="hero-title">Welcome to <span class="highlight">Lucky Casino</span></h1>
+                <p class="hero-subtitle">Experience the thrill of premium casino gaming with neon-perfect UI, tactile feedback, and instant insights.</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-large btn-gold" onclick="scrollToGames()">Play Now</button>
+                    <button class="btn btn-large btn-outline">Peek Inside</button>
+                </div>
+                <div class="hero-badges" role="list">
+                    <span class="hero-badge" role="listitem">⚖ Provably Fair</span>
+                    <span class="hero-badge" role="listitem">🔒 Secure Wallet</span>
+                    <span class="hero-badge" role="listitem">💎 VIP Ready</span>
+                </div>
+                <div class="hero-metrics">
+                    <div class="metric-card">
+                        <span class="metric-label">Players Online</span>
+                        <span class="metric-number" data-counter-target="42800" data-counter-format="number">0</span>
+                        <span class="metric-subtitle">Across 42 private tables</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Progressive Jackpot</span>
+                        <span class="metric-number" data-counter-target="2830000" data-counter-format="currency" data-counter-prefix="$">0</span>
+                        <span class="metric-subtitle">Grows with every spin</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Payout Rate</span>
+                        <span class="metric-number" data-counter-target="97.3" data-counter-format="percent" data-counter-suffix="%">0%</span>
+                        <span class="metric-subtitle">Audited hourly</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-showcase tilt-hover" aria-label="Live casino snapshot">
+                <div class="showcase-card primary">
+                    <div class="card-label">Live Jackpot</div>
+                    <div class="card-value">$2,830,000</div>
+                    <div class="card-subtitle">Next drop predicted in 12 spins</div>
+                    <div class="card-chip">💠 Neural RNG synced</div>
+                </div>
+                <div class="showcase-card secondary">
+                    <div class="player-meta">
+                        <span class="player-label">Top Player</span>
+                        <span class="player-name">AstraNova</span>
+                        <span class="player-profit">+$128,400 today</span>
+                    </div>
+                    <div class="chip-stack">
+                        <span class="chip chip-gold">$500</span>
+                        <span class="chip chip-rose">$1K</span>
+                        <span class="chip chip-cyan">$5K</span>
+                    </div>
+                    <div class="pulse-badge">Streaming Table 07</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Secondary Status Bar -->
+    <div class="status-bar" aria-live="polite">
+        <div class="status-group">
+            <div class="status-item" id="dailyBonusStatus">
+                <span class="status-label">Daily Bonus:</span>
+                <button class="status-action" id="claimDailyBonusBtn" disabled>Checking...</button>
+            </div>
+            <div class="status-item" id="fairnessStatus">
+                <span class="status-label">Fairness Seed:</span>
+                <span class="status-value" id="fairnessSeed">—</span>
+                <button class="status-action" id="verifyFairnessBtn" disabled>Verify</button>
+            </div>
+        </div>
+        <div class="status-group">
+            <div class="status-item">
+                <span class="status-label">XP:</span>
+                <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+                <span class="status-value" id="xpValue">0 / 1000</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Feed -->
+    <section class="live-feed reveal" aria-label="Live casino highlights">
+        <div class="container">
+            <div class="live-feed-header">
+                <div class="live-pill">Live Pulse</div>
+                <p>Realtime wins, bonuses, and featured drops across Lucky Casino.</p>
+            </div>
+            <div class="live-ticker" role="marquee" aria-live="polite">
+                <div class="ticker-track" id="liveTickerTrack"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Games Section -->
+    <section id="games" class="games-section reveal" aria-labelledby="games-heading">
+        <div class="container">
+            <h2 id="games-heading" class="section-title">Our Games</h2>
+            <div class="games-grid">
+                <!-- Slot Machine -->
+                <div class="game-card tilt-hover reveal" data-game="slots">
+                    <div class="game-icon">🎰</div>
+                    <h3>Slot Machine</h3>
+                    <p>Spin the reels and win big!</p>
+                    <button class="btn btn-game" onclick="openGame('slots')">Play Now</button>
+                </div>
+
+                <!-- Roulette -->
+                <div class="game-card tilt-hover reveal" data-game="roulette">
+                    <div class="game-icon">🎲</div>
+                    <h3>Roulette</h3>
+                    <p>Bet on your lucky number!</p>
+                    <button class="btn btn-game" onclick="openGame('roulette')">Play Now</button>
+                </div>
+
+                <!-- Blackjack -->
+                <div class="game-card tilt-hover reveal" data-game="blackjack">
+                    <div class="game-icon">🃏</div>
+                    <h3>Blackjack</h3>
+                    <p>Beat the dealer!</p>
+                    <button class="btn btn-game" onclick="openGame('blackjack')">Play Now</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience" class="experience-section reveal" aria-labelledby="experience-heading">
+        <div class="container">
+            <h2 id="experience-heading" class="section-title">Designed for Immersion</h2>
+            <p class="section-subtitle">Every interaction feels tactile, responsive, and reassuring for new players and high rollers alike.</p>
+            <div class="experience-grid">
+                <article class="experience-card tilt-hover">
+                    <div class="experience-icon">🪙</div>
+                    <h3>Luxury Micro-interactions</h3>
+                    <p>Buttons, cards, and chips respond with cinematic motion, depth, and haptic-ready timings.</p>
+                    <ul>
+                        <li>3D tilt with spring physics</li>
+                        <li>Contextual glow states</li>
+                        <li>Accessible focus outlines</li>
+                    </ul>
+                </article>
+                <article class="experience-card tilt-hover">
+                    <div class="experience-icon">📊</div>
+                    <h3>Insightful HUD</h3>
+                    <p>Keep status, XP, fairness seeds, and streaks within reach without leaving the action.</p>
+                    <ul>
+                        <li>Live XP progress</li>
+                        <li>Fairness verification</li>
+                        <li>Wallet + transactions</li>
+                    </ul>
+                </article>
+                <article class="experience-card tilt-hover">
+                    <div class="experience-icon">🤝</div>
+                    <h3>Responsible by Design</h3>
+                    <p>Built-in limits, reminders, and gentle nudges keep play sustainable and transparent.</p>
+                    <ul>
+                        <li>Daily bonus cadence</li>
+                        <li>Loss limit messaging</li>
+                        <li>Session visibility</li>
+                    </ul>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Spotlight Section -->
+    <section id="spotlight" class="spotlight-section reveal" aria-labelledby="spotlight-heading">
+        <div class="container">
+            <h2 id="spotlight-heading" class="section-title">Tonight's Spotlight</h2>
+            <p class="section-subtitle">Peek at what's running hot right now – tournaments, hosts, and tables curated for that extra wow factor.</p>
+            <div class="spotlight-grid">
+                <article class="spotlight-card" data-spotlight="event">
+                    <div class="card-badge">Next Event</div>
+                    <h3>High Roller Sprint</h3>
+                    <p class="spotlight-desc">Friday · 21:00 UTC · Table 09</p>
+                    <div class="countdown" data-countdown data-countdown-target="">
+                        <div class="countdown-item">
+                            <span data-countdown-part="days">00</span>
+                            <small>days</small>
+                        </div>
+                        <div class="countdown-item">
+                            <span data-countdown-part="hours">00</span>
+                            <small>hrs</small>
+                        </div>
+                        <div class="countdown-item">
+                            <span data-countdown-part="minutes">00</span>
+                            <small>min</small>
+                        </div>
+                        <div class="countdown-item">
+                            <span data-countdown-part="seconds">00</span>
+                            <small>sec</small>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="tag">Buy-in $5K</span>
+                        <span class="tag accent">200 seats</span>
+                    </div>
+                </article>
+
+                <article class="spotlight-card" data-spotlight="hosts">
+                    <div class="card-badge accent">VIP Hosts</div>
+                    <h3>Concierge Status</h3>
+                    <p class="spotlight-desc">Dedicated hosts keeping your streak silky smooth.</p>
+                    <div class="host-list">
+                        <div class="host-avatar">
+                            <span>LYR</span>
+                            <small>Lyra</small>
+                        </div>
+                        <div class="host-avatar">
+                            <span>RZK</span>
+                            <small>Razek</small>
+                        </div>
+                        <div class="host-avatar">
+                            <span>VLT</span>
+                            <small>Violet</small>
+                        </div>
+                    </div>
+                    <ul class="host-perks">
+                        <li>Private voice tables & curated playlists</li>
+                        <li>Loss-guard & bespoke bonus pacing</li>
+                        <li>Instant withdrawals up to $50K</li>
+                    </ul>
+                </article>
+
+                <article class="spotlight-card" data-spotlight="heatmap">
+                    <div class="card-badge neon">Tonight's Heatmap</div>
+                    <h3>Where the energy peaks</h3>
+                    <div class="heatmap-list">
+                        <div class="heatmap-row">
+                            <span>Slots</span>
+                            <div class="heatmap-bar" data-heat-value="86">
+                                <div class="heatmap-fill"></div>
+                                <span class="heatmap-value">86%</span>
+                            </div>
+                        </div>
+                        <div class="heatmap-row">
+                            <span>Roulette</span>
+                            <div class="heatmap-bar" data-heat-value="65">
+                                <div class="heatmap-fill"></div>
+                                <span class="heatmap-value">65%</span>
+                            </div>
+                        </div>
+                        <div class="heatmap-row">
+                            <span>Blackjack</span>
+                            <div class="heatmap-bar" data-heat-value="74">
+                                <div class="heatmap-fill"></div>
+                                <span class="heatmap-value">74%</span>
+                            </div>
+                        </div>
+                        <div class="heatmap-row">
+                            <span>Crash</span>
+                            <div class="heatmap-bar" data-heat-value="52">
+                                <div class="heatmap-fill"></div>
+                                <span class="heatmap-value">52%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="tag">Live data refresh</span>
+                        <span class="tag accent">+12% vibe</span>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Game Modals -->
+    <!-- Slot Machine Modal -->
+    <div id="slotsModal" class="modal" aria-hidden="true">
+        <div class="modal-content game-modal" role="dialog" aria-modal="true" aria-labelledby="slots-title">
+            <span class="close" onclick="closeGame('slots')" aria-label="Close slot machine dialog">&times;</span>
+            <h2 id="slots-title">Slot Machine</h2>
+            <div class="slot-machine">
+                <div class="slot-display">
+                    <div class="reel" id="reel1">🍒</div>
+                    <div class="reel" id="reel2">🍋</div>
+                    <div class="reel" id="reel3">🍊</div>
+                </div>
+                <div class="slot-controls">
+                    <div class="bet-section">
+                        <label>Bet Amount:</label>
+                        <input type="number" id="slotBet" min="10" max="1000" value="50" step="10">
+                    </div>
+                    <button class="btn btn-spin" id="spinBtn" onclick="spinSlots()">SPIN</button>
+                    <div class="win-message" id="slotWinMessage"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Roulette Modal -->
+    <div id="rouletteModal" class="modal" aria-hidden="true">
+        <div class="modal-content game-modal" role="dialog" aria-modal="true" aria-labelledby="roulette-title">
+            <span class="close" onclick="closeGame('roulette')" aria-label="Close roulette dialog">&times;</span>
+            <h2 id="roulette-title">Roulette</h2>
+            <div class="roulette-game">
+                <div class="roulette-wheel" id="rouletteWheel">
+                    <div class="wheel-inner">
+                        <div class="ball" id="rouletteBall"></div>
+                    </div>
+                </div>
+                <div class="roulette-controls">
+                    <div class="bet-section">
+                        <label>Bet Amount:</label>
+                        <input type="number" id="rouletteBet" min="10" max="1000" value="50" step="10">
+                    </div>
+                    <div class="bet-options">
+                        <button class="bet-btn" onclick="placeBet('red')">Red</button>
+                        <button class="bet-btn" onclick="placeBet('black')">Black</button>
+                        <button class="bet-btn" onclick="placeBet('green')">Green</button>
+                    </div>
+                    <button class="btn btn-spin" onclick="spinRoulette()">SPIN</button>
+                    <div class="win-message" id="rouletteWinMessage"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blackjack Modal -->
+    <div id="blackjackModal" class="modal" aria-hidden="true">
+        <div class="modal-content game-modal" role="dialog" aria-modal="true" aria-labelledby="blackjack-title">
+            <span class="close" onclick="closeGame('blackjack')" aria-label="Close blackjack dialog">&times;</span>
+            <h2 id="blackjack-title">Blackjack</h2>
+            <div class="blackjack-game">
+                <div class="dealer-section">
+                    <h3>Dealer</h3>
+                    <div class="cards" id="dealerCards"></div>
+                    <div class="score" id="dealerScore"></div>
+                </div>
+                <div class="player-section">
+                    <h3>You</h3>
+                    <div class="cards" id="playerCards"></div>
+                    <div class="score" id="playerScore"></div>
+                </div>
+                <div class="blackjack-controls">
+                    <div class="bet-section">
+                        <label>Bet Amount:</label>
+                        <input type="number" id="blackjackBet" min="10" max="1000" value="50" step="10">
+                    </div>
+                    <div class="game-buttons">
+                        <button class="btn btn-game-action" id="dealBtn" onclick="dealCards()">Deal</button>
+                        <button class="btn btn-game-action" id="hitBtn" onclick="hit()" disabled>Hit</button>
+                        <button class="btn btn-game-action" id="standBtn" onclick="stand()" disabled>Stand</button>
+                    </div>
+                    <div class="win-message" id="blackjackWinMessage"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Finance Modal -->
+    <div id="financeModal" class="modal" aria-hidden="true">
+        <div class="modal-content game-modal" role="dialog" aria-modal="true" aria-labelledby="finance-title">
+            <span class="close" onclick="closeFinance()" aria-label="Close balance management dialog">&times;</span>
+            <h2 id="finance-title">Balance Management</h2>
+            <div class="finance-tabs" role="tablist">
+                <button class="finance-tab active" id="tab-deposit" role="tab" aria-selected="true" aria-controls="depositForm" onclick="switchFinanceTab('deposit')">Deposit</button>
+                <button class="finance-tab" id="tab-withdraw" role="tab" aria-selected="false" aria-controls="withdrawForm" onclick="switchFinanceTab('withdraw')">Withdraw</button>
+            </div>
+            <div class="finance-body">
+                <form id="depositForm" class="finance-form" role="tabpanel" aria-labelledby="tab-deposit" onsubmit="handleDeposit(event)">
+                    <label for="depositAmount">Amount</label>
+                    <input type="number" id="depositAmount" min="10" step="10" value="100">
+                    <button type="submit" class="btn btn-primary">Deposit Funds</button>
+                </form>
+                <form id="withdrawForm" class="finance-form hidden" role="tabpanel" aria-labelledby="tab-withdraw" onsubmit="handleWithdraw(event)">
+                    <label for="withdrawAmount">Amount</label>
+                    <input type="number" id="withdrawAmount" min="10" step="10" value="50">
+                    <button type="submit" class="btn btn-outline">Withdraw Funds</button>
+                </form>
+                <div id="financeMessage" class="win-message" aria-live="polite"></div>
+                <div class="transactions-section">
+                    <h3 class="transactions-title">Recent Transactions</h3>
+                    <ul id="transactionList" class="transaction-list" aria-live="polite"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentication Modal -->
+    <div id="authModal" class="modal" aria-hidden="true">
+        <div class="modal-content game-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+            <span class="close" onclick="closeAuth()" aria-label="Close authentication dialog">&times;</span>
+            <h2 id="auth-title">Welcome to Lucky Casino</h2>
+            <div class="auth-tabs" role="tablist">
+                <button class="finance-tab active" id="tab-login" role="tab" aria-selected="true" onclick="switchAuthTab('login')">Login</button>
+                <button class="finance-tab" id="tab-signup" role="tab" aria-selected="false" onclick="switchAuthTab('signup')">Sign Up</button>
+            </div>
+            <div class="finance-body">
+                <form id="loginForm" class="finance-form" onsubmit="handleLogin(event)">
+                    <label for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" required autocomplete="username">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required autocomplete="current-password">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                    <div class="auth-demo-note">Demo Mode: Any username/password will work</div>
+                </form>
+                <form id="signupForm" class="finance-form hidden" onsubmit="handleSignup(event)">
+                    <label for="signupUsername">Username</label>
+                    <input type="text" id="signupUsername" required minlength="3" autocomplete="username">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required autocomplete="email">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required minlength="6" autocomplete="new-password">
+                    <button type="submit" class="btn btn-primary">Create Account</button>
+                    <div class="auth-demo-note">Demo Mode: Creates local account</div>
+                </form>
+                <div id="authMessage" class="win-message" aria-live="polite"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Container -->
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboardModal" class="modal" aria-hidden="true">
+        <div class="modal-content modal-wide" role="dialog" aria-modal="true" aria-labelledby="leaderboard-title">
+            <span class="close" data-close="leaderboardModal" aria-label="Close leaderboard dialog">&times;</span>
+            <h2 id="leaderboard-title">Leaderboard</h2>
+            <div class="modal-section">
+                <div class="leaderboard-tabs" role="tablist">
+                    <button class="leaderboard-tab active" data-lb-type="profit" role="tab" aria-selected="true">Net Profit</button>
+                    <button class="leaderboard-tab" data-lb-type="level" role="tab" aria-selected="false">Level</button>
+                    <button class="leaderboard-tab" data-lb-type="slots" role="tab" aria-selected="false">Slots</button>
+                    <button class="leaderboard-tab" data-lb-type="roulette" role="tab" aria-selected="false">Roulette</button>
+                    <button class="leaderboard-tab" data-lb-type="blackjack" role="tab" aria-selected="false">Blackjack</button>
+                </div>
+                <div class="leaderboard-body">
+                    <ol id="leaderboardList" class="leaderboard-list" aria-live="polite"></ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievements Modal -->
+    <div id="achievementsModal" class="modal" aria-hidden="true">
+        <div class="modal-content modal-wide" role="dialog" aria-modal="true" aria-labelledby="achievements-title">
+            <span class="close" data-close="achievementsModal" aria-label="Close achievements dialog">&times;</span>
+            <h2 id="achievements-title">Achievements</h2>
+            <div id="achievementsGrid" class="achievements-grid" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div id="statsModal" class="modal" aria-hidden="true">
+        <div class="modal-content modal-wide" role="dialog" aria-modal="true" aria-labelledby="stats-title">
+            <span class="close" data-close="statsModal" aria-label="Close stats dialog">&times;</span>
+            <h2 id="stats-title">Player Statistics</h2>
+            <div class="stats-grid" id="statsGrid" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <!-- Global Loader -->
+    <div id="globalLoader" class="loader-overlay hidden" aria-hidden="true" aria-label="Loading">
+        <div class="loader-spinner"></div>
+    </div>
+
+    <!-- Promotions Section -->
+    <section id="promotions" class="promotions-section reveal" aria-labelledby="promotions-heading">
+        <div class="container">
+            <h2 id="promotions-heading" class="section-title">Special Promotions</h2>
+            <div class="promotions-grid">
+                <div class="promo-card tilt-hover reveal">
+                    <div class="promo-badge">NEW</div>
+                    <h3>Welcome Bonus</h3>
+                    <p class="promo-amount">100% Match Up To $500</p>
+                    <p class="promo-desc">Get double your first deposit!</p>
+                    <button class="btn btn-promo">Claim Now</button>
+                </div>
+                <div class="promo-card tilt-hover reveal">
+                    <div class="promo-badge">HOT</div>
+                    <h3>Daily Free Spins</h3>
+                    <p class="promo-amount">50 Free Spins</p>
+                    <p class="promo-desc">Every day at midnight!</p>
+                    <button class="btn btn-promo">Claim Now</button>
+                </div>
+                <div class="promo-card tilt-hover reveal">
+                    <div class="promo-badge">VIP</div>
+                    <h3>VIP Rewards</h3>
+                    <p class="promo-amount">Exclusive Benefits</p>
+                    <p class="promo-desc">Join our VIP program today!</p>
+                    <button class="btn btn-promo">Learn More</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="promotions-section reveal" aria-labelledby="about-heading">
+        <div class="container">
+            <h2 id="about-heading" class="section-title">About Us</h2>
+            <div class="promotions-grid">
+                <div class="promo-card tilt-hover reveal" aria-label="Our Mission">
+                    <h3>Our Mission</h3>
+                    <p class="promo-desc">Deliver immersive, fair, and thrilling gaming experiences with cutting-edge design and responsible play principles.</p>
+                </div>
+                <div class="promo-card tilt-hover reveal" aria-label="Security & Fairness">
+                    <h3>Security & Fairness</h3>
+                    <p class="promo-desc">We emphasize transparency and simulated odds. All randomness is client-side and purely for entertainment.</p>
+                </div>
+                <div class="promo-card tilt-hover reveal" aria-label="Future Roadmap">
+                    <h3>Future Roadmap</h3>
+                    <p class="promo-desc">More games, player profiles, progressive jackpots, social tables, and accessibility enhancements.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Lucky Casino</h4>
+                    <p>Your premier destination for online casino gaming. Play responsibly.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#games">Games</a></li>
+                        <li><a href="#promotions">Promotions</a></li>
+                        <li><a href="#about">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Responsible Gaming</a></li>
+                        <li><a href="#">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Lucky Casino. All rights reserved. | 18+ Only. Play Responsibly.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="api-client.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+
