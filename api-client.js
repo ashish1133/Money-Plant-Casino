@@ -35,6 +35,8 @@ function makeUrl(endpoint){
             case '/users/profile': return API_BASE_URL.replace(/\/$/,'') + '/usersProfile';
             case '/wallet/deposit': return API_BASE_URL.replace(/\/$/,'') + '/walletDeposit';
             case '/wallet/withdraw': return API_BASE_URL.replace(/\/$/,'') + '/walletWithdraw';
+            case '/games/slots': return API_BASE_URL.replace(/\/$/,'') + '/gamesSlots';
+            case '/games/roulette': return API_BASE_URL.replace(/\/$/,'') + '/gamesRoulette';
             default:
                 // Fallback: strip leading '/api' and slashes -> function name
                 return API_BASE_URL.replace(/\/$/,'') + '/' + endpoint.replace(/^\/?(api\/)?/,'').replace(/\//g,'_');
