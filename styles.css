@@ -518,11 +518,11 @@ body.nav-menu-open {
     .nav-container { position: relative; grid-template-columns: 1fr auto; grid-template-areas: 'logo actions' 'links links'; row-gap: 0.5rem; }
     .nav-links {
         position: fixed;
-        top: 52px;
+        top: 48px;
         right: 0;
         width: 260px;
         max-width: 85vw;
-        height: calc(100vh - 52px);
+        height: calc(100vh - 48px);
         padding: 1rem;
         display: flex;
         flex-direction: column;
@@ -665,13 +665,13 @@ body.nav-menu-open {
 @media (max-width:1024px){ .user-section { gap: 0.45rem; } }
 
 /* Further Compact Header Adjustments */
-.navbar { padding: 0.38rem 0; }
-.navbar.nav-shrink { padding: 0.22rem 0; }
-.logo { font-size: 1.0rem; gap: 6px; }
+.navbar { padding: 0.26rem 0; }
+.navbar.nav-shrink { padding: 0.14rem 0; }
+.logo { font-size: 1rem; gap: 6px; }
 .logo-icon { font-size: 1.2rem; }
 .user-section { gap: 0.5rem; }
 .icon-btn { padding: 0.26rem 0.5rem; font-size: 0.74rem; }
-.balance { padding: 0.32rem 0.6rem; gap: 0.25rem; }
+.balance { padding: 0.3rem 0.55rem; gap: 0.28rem; }
 .balance-amount { font-size: 0.9rem; min-width: 72px; }
 
 /* User Profile */
@@ -784,7 +784,7 @@ body.nav-menu-open {
 /* Notification System */
 .notification-container {
     position: fixed;
-    top: 56px;
+    top: 50px;
     right: 20px;
     z-index: 3000;
     display: flex;

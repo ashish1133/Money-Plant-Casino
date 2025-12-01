@@ -391,11 +391,11 @@ body.nav-menu-open {
     .nav-container { position: relative; grid-template-columns: 1fr auto; grid-template-areas: 'logo actions' 'links links'; row-gap: 0.5rem; }
     .nav-links {
         position: fixed;
-        top: 80px;
+        top: 52px;
         right: 0;
-        width: 280px;
+        width: 260px;
         max-width: 85vw;
-        height: calc(100vh - 80px);
+        height: calc(100vh - 52px);
         padding: 1rem;
         display: flex;
         flex-direction: column;
@@ -413,7 +413,7 @@ body.nav-menu-open {
 .nav-link, .nav-btn {
     align-items: center;
     display: inline-flex;
-    padding: 0.35rem 0.25rem;
+    padding: 0.28rem 0.2rem;
 }
 .nav-link:hover::before {
     content: '';
@@ -428,7 +428,7 @@ body.nav-menu-open {
 /* Mobile menu visual polish */
 @media (max-width: 1024px) {
     .nav-links a, .nav-links .nav-btn {
-        padding: 0.6rem 0.75rem;
+        padding: 0.52rem 0.65rem;
         border-radius: 10px;
         border: 1px solid rgba(255,255,255,0.06);
         background: rgba(255,255,255,0.03);
@@ -527,26 +527,26 @@ body.nav-menu-open {
 }
 
 /* --- Compact Header Overrides (non-destructive) --- */
-.navbar { padding: 0.7rem 0; box-shadow: var(--shadow-sm); }
-.navbar.nav-shrink { padding: 0.5rem 0; }
-.nav-container { column-gap: 0.75rem; }
-.logo { font-size: 1.3rem; gap: 10px; filter: drop-shadow(0 0 5px rgba(255,215,0,0.22)); }
-.logo-icon { font-size: 1.6rem; }
-.user-section { gap: 0.9rem; }
-.icon-btn { padding: 0.5rem 0.85rem; font-size: 0.85rem; box-shadow: 0 3px 12px rgba(255,215,0,0.35); }
-.balance { padding: 0.5rem 0.9rem; gap: 0.45rem; }
-.balance-amount { font-size: 1.05rem; letter-spacing: 0.4px; min-width: 100px; }
-@media (max-width:1024px){ .user-section { gap: 0.45rem; } }
+.navbar { padding: 0.38rem 0; box-shadow: var(--shadow-sm); }
+.navbar.nav-shrink { padding: 0.24rem 0; }
+.nav-container { column-gap: 0.5rem; }
+.logo { font-size: 1.15rem; gap: 8px; filter: drop-shadow(0 0 5px rgba(255,215,0,0.22)); }
+.logo-icon { font-size: 1.3rem; }
+.user-section { gap: 0.7rem; }
+.icon-btn { padding: 0.36rem 0.6rem; font-size: 0.8rem; box-shadow: 0 3px 12px rgba(255,215,0,0.35); }
+.balance { padding: 0.42rem 0.7rem; gap: 0.35rem; }
+.balance-amount { font-size: 1rem; letter-spacing: 0.3px; min-width: 88px; }
+@media (max-width:1024px){ .user-section { gap: 0.5rem; } }
 
 /* Further Compact Header Adjustments */
-.navbar { padding: 0.5rem 0; }
-.navbar.nav-shrink { padding: 0.3rem 0; }
-.logo { font-size: 1.1rem; gap: 8px; }
-.logo-icon { font-size: 1.4rem; }
-.user-section { gap: 0.6rem; }
-.icon-btn { padding: 0.4rem 0.7rem; font-size: 0.8rem; }
-.balance { padding: 0.4rem 0.7rem; gap: 0.3rem; }
-.balance-amount { font-size: 0.95rem; min-width: 80px; }
+.navbar { padding: 0.28rem 0; }
+.navbar.nav-shrink { padding: 0.16rem 0; }
+.logo { font-size: 1.02rem; gap: 6px; }
+.logo-icon { font-size: 1.18rem; }
+.user-section { gap: 0.52rem; }
+.icon-btn { padding: 0.28rem 0.52rem; font-size: 0.76rem; }
+.balance { padding: 0.34rem 0.58rem; gap: 0.28rem; }
+.balance-amount { font-size: 0.92rem; min-width: 76px; }
 
 /* User Profile */
 .user-profile {
@@ -610,9 +610,7 @@ body.nav-menu-open {
 
 /* Compact layout on smaller screens: stack neatly */
 @media (max-width: 768px) {
-    .navbar .nav-container {
-        gap: 0.75rem;
-    }
+    .navbar .nav-container { gap: 0.6rem; }
     .navbar .user-section {
         width: 100%;
         justify-content: flex-end;
@@ -630,7 +628,7 @@ body.nav-menu-open {
         order: 3;
     }
     .navbar .user-section .balance-amount { min-width: unset; text-align: left; }
-    .navbar .user-section .icon-btn { padding: 0.5rem 0.8rem; }
+    .navbar .user-section .icon-btn { padding: 0.42rem 0.7rem; }
 }
 
 /* Align hero buttons (home screen) consistently */
@@ -658,7 +656,7 @@ body.nav-menu-open {
 /* Notification System */
 .notification-container {
     position: fixed;
-    top: 80px;
+    top: 56px;
     right: 20px;
     z-index: 3000;
     display: flex;
