@@ -675,6 +675,12 @@ body.nav-menu-open {
 .balance-amount { font-size: 0.9rem; min-width: 72px; }
 
 /* User Profile */
+.navbar .btn { padding: 0.36rem 0.7rem; font-size: 0.85rem; border-radius: 10px; letter-spacing: 0.6px; }
+.navbar .btn-primary { box-shadow: 0 2px 8px rgba(255,215,0,0.28), inset 0 1px 0 rgba(255,255,255,0.2); }
+.navbar .btn-outline { border-width: 1px; }
+.nav-link { font-size: 0.85rem; }
+.logo { font-size: 0.9rem; gap: 6px; }
+.logo-icon { font-size: 1rem; }
 .navbar .nav-container { padding: 0 12px; }
 .navbar { padding: 0.2rem 0; }
 .navbar.nav-shrink { padding: 0.12rem 0; }
@@ -806,7 +812,7 @@ body.nav-menu-open {
 /* Notification System */
 .notification-container {
     position: fixed;
-    top: 46px;
+    top: 42px;
     right: 20px;
     z-index: 3000;
     display: flex;
