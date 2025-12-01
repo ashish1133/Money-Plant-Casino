@@ -52,6 +52,51 @@ try {
     };
     await setDoc(userDoc, { createdAt: serverTimestamp(), ...base, ...extra }, { merge: true });
   }
+  async function getApiBase(){
+    try {
+      if (typeof window !== 'undefined' && window.API_BASE_URL) return window.API_BASE_URL;
+      const meta = document.querySelector('meta[name="api-base"]');
+      if (meta && meta.content) return meta.content.trim();
+      if (typeof window !== 'undefined' && window.location && window.location.hostname !== 'localhost') {
+        return window.location.origin.replace(/\/$/, '') + '/api';
+      }
+    } catch (_) {}
+    return 'http://localhost:3000/api';
+  }
+
+  async function serverRegistrationSync(user, data={}){
+    try {
+      if (!user || typeof fetch !== 'function' || typeof user.getIdToken !== 'function') return false;
+      const apiBase = await getApiBase();
+      const token = await user.getIdToken(true);
+      const payload = {
+        email: user.email || data.email || '',
+        name: user.displayName || data.name || '',
+        phone: data.phone || user.phoneNumber || '',
+        age: Number.isFinite(data.age) ? data.age : null,
+        gender: data.gender || '',
+        provider: (user.providerData && user.providerData[0] && user.providerData[0].providerId) || 'password'
+      };
+      const res = await fetch(`${apiBase}/users/registration-sync`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(()=>({}));
+        throw new Error(body.error || `Server sync failed (${res.status})`);
+      }
+      return true;
+    } catch (err) {
+      console.warn('Server registration sync failed:', err?.message || err);
+      try { window.__registrationLastError = err?.message || String(err); } catch(_) {}
+      return false;
+    }
+  }
+
   async function recordRegistration(user, data={}){
     try {
       if (!user) return;
@@ -71,6 +116,7 @@ try {
     } catch (e) {
       console.warn('Registration record failed:', e?.message || e);
       try { window.__registrationLastError = e?.message || String(e); } catch(_) {}
+      await serverRegistrationSync(user, data);
     }
   }
   // Expose helpers for the app to use
