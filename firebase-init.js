@@ -74,7 +74,12 @@ try {
   window.firebaseAuth = auth;
   window.firebaseLogin = async (email, password) => {
     const cred = await signInWithEmailAndPassword(auth, email, password);
-    return cred.user;
+    const user = cred.user;
+    try {
+      await ensureUserDoc(user);
+      await recordRegistration(user, { email });
+    } catch (_) {}
+    return user;
   };
   window.firebaseSignup = async (email, password) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
@@ -111,6 +116,7 @@ try {
     const cred = await signInWithPopup(auth, provider);
     const user = cred.user;
     await ensureUserDoc(user);
+    try { await recordRegistration(user, { email: user.email || '' }); } catch (_) {}
     return user;
   };
   window.firebaseLogout = async () => { await signOut(auth); };
