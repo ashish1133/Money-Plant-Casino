@@ -205,6 +205,14 @@ async function renderRegistrationDetails(){
 		const data = await window.getRegistrationDoc();
 		if(!data){
 			if(status) status.textContent = 'No registration document found.';
+			const btn = document.getElementById('syncRegistrationBtn');
+			if(btn){
+				btn.onclick = async ()=>{
+					btn.disabled = true; const prev = btn.textContent; btn.textContent='Syncing…';
+					try { await window.syncRegistration(); await renderRegistrationDetails(); }
+					finally { btn.disabled=false; btn.textContent=prev; }
+				};
+			}
 			return;
 		}
 		const fmt = (ts)=>{
@@ -223,6 +231,14 @@ async function renderRegistrationDetails(){
 			<div><label class="note">Updated</label><div class="stat-value">${fmt(data.updatedAt)}</div></div>
 			<div class="full note">These details are stored in Firestore collection <code>registure_users</code>.</div>
 		`;
+		const btn = document.getElementById('syncRegistrationBtn');
+		if(btn){
+			btn.onclick = async ()=>{
+				btn.disabled = true; const prev = btn.textContent; btn.textContent='Syncing…';
+				try { await window.syncRegistration(); await renderRegistrationDetails(); }
+				finally { btn.disabled=false; btn.textContent=prev; }
+			};
+		}
 	} catch(e){
 		if(status) status.textContent = 'Failed to load registration details.';
 	}

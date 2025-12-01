@@ -3,7 +3,7 @@
 // Note: This does NOT affect server-side auth or database; it only enables Analytics on the client.
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
 import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile, GoogleAuthProvider, OAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile, GoogleAuthProvider, OAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -138,6 +138,30 @@ try {
       return null;
     }
   };
+
+  // Expose manual sync helper and auto-sync on auth
+  window.syncRegistration = async () => {
+    const u = auth.currentUser;
+    if (!u) throw new Error('Not signed in');
+    try {
+      await ensureUserDoc(u);
+      await recordRegistration(u, { email: u.email || '', name: u.displayName || '', phone: u.phoneNumber || '' });
+      return true;
+    } catch (e) {
+      console.warn('Registration sync failed:', e?.message || e);
+      return false;
+    }
+  };
+
+  try {
+    onAuthStateChanged(auth, async (u) => {
+      if (!u) return;
+      try {
+        await ensureUserDoc(u);
+        await recordRegistration(u, { email: u.email || '', name: u.displayName || '', phone: u.phoneNumber || '' });
+      } catch (_) {}
+    });
+  } catch(_) {}
 
   const supported = await isSupported();
   if (supported) {
