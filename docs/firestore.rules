@@ -19,7 +19,6 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
       allow read: if request.auth != null && request.auth.token.admin == true;
     }
-
     match /transactions/{docId} {
       // Create allowed for authenticated users (writes are from server via Admin SDK in this app)
       allow create: if request.auth != null;
