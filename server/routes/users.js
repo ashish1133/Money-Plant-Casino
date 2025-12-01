@@ -2,6 +2,7 @@ const express = require('express');
 const firebaseAuthenticate = require('../middleware/firebaseAuthenticate');
 const ProgressionService = require('../services/progressionService');
 const LeaderboardService = require('../services/leaderboardService');
+const FirestoreService = require('../services/firestoreService');
 const { db } = require('../config/database');
 const router = express.Router();
 
@@ -110,6 +111,19 @@ router.get('/stats', firebaseAuthenticate, (req, res) => {
             },
             gameBreakdown
         });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Registration sync (server-side via Admin SDK)
+router.post('/registration-sync', firebaseAuthenticate, async (req, res) => {
+    try {
+        const uid = req.firebaseUid;
+        const { name, phone, age, gender, email, provider } = req.body || {};
+        const ok = await FirestoreService.recordRegistration({ uid, name, phone, age, gender, email, provider });
+        if (!ok) return res.status(503).json({ error: 'Firestore not configured on server' });
+        res.json({ ok: true });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

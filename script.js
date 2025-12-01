@@ -209,8 +209,17 @@ async function renderRegistrationDetails(){
 			if(btn){
 				btn.onclick = async ()=>{
 					btn.disabled = true; const prev = btn.textContent; btn.textContent='Syncing…';
-					try { await window.syncRegistration(); await renderRegistrationDetails(); }
-					finally { btn.disabled=false; btn.textContent=prev; }
+					try {
+						const ok = await window.syncRegistration();
+						await new Promise(r=>setTimeout(r,200));
+						let after = await window.getRegistrationDoc();
+						if(!after && typeof apiClient?.request === 'function'){
+							try { await apiClient.request('/users/registration-sync', { method:'POST', body: JSON.stringify({}) }); } catch(_) {}
+							await new Promise(r=>setTimeout(r,200));
+							after = await window.getRegistrationDoc();
+						}
+						await renderRegistrationDetails();
+					} finally { btn.disabled=false; btn.textContent=prev; }
 				};
 			}
 			return;
@@ -235,8 +244,17 @@ async function renderRegistrationDetails(){
 		if(btn){
 			btn.onclick = async ()=>{
 				btn.disabled = true; const prev = btn.textContent; btn.textContent='Syncing…';
-				try { await window.syncRegistration(); await renderRegistrationDetails(); }
-				finally { btn.disabled=false; btn.textContent=prev; }
+				try {
+					const ok = await window.syncRegistration();
+					await new Promise(r=>setTimeout(r,200));
+					let after = await window.getRegistrationDoc();
+					if(!after && typeof apiClient?.request === 'function'){
+						try { await apiClient.request('/users/registration-sync', { method:'POST', body: JSON.stringify({ email: (currentUser&&currentUser.email)||'' }) }); } catch(_) {}
+						await new Promise(r=>setTimeout(r,200));
+						after = await window.getRegistrationDoc();
+					}
+					await renderRegistrationDetails();
+				} finally { btn.disabled=false; btn.textContent=prev; }
 			};
 		}
 	} catch(e){

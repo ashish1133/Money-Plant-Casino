@@ -3,6 +3,34 @@ let admin = null;
 try { admin = require('firebase-admin'); } catch (_) {}
 
 class FirestoreService {
+  static async recordRegistration({ uid, email, name, phone, age, gender, provider }) {
+    try {
+      const db = getFirestore();
+      if (!db) return false;
+      const id = String(uid);
+      const docRef = db.collection('registure_users').doc(id);
+      const data = {
+        uid: id,
+        email: email || '',
+        name: name || '',
+        phone: phone || '',
+        age: Number.isFinite?.(age) ? age : (typeof age === 'number' ? age : null),
+        gender: gender || '',
+        provider: provider || 'password',
+        updatedAt: admin ? admin.firestore.FieldValue.serverTimestamp() : Date.now()
+      };
+      // Only set createdAt when creating
+      const existing = await docRef.get();
+      if (!existing.exists) {
+        data.createdAt = admin ? admin.firestore.FieldValue.serverTimestamp() : Date.now();
+      }
+      await docRef.set(data, { merge: true });
+      return true;
+    } catch (e) {
+      console.warn('Firestore recordRegistration failed:', e.message);
+      return false;
+    }
+  }
   static async syncUserProfile({ userId, username, email, level, xp, balance, createdAt }) {
     try {
       const db = getFirestore();
