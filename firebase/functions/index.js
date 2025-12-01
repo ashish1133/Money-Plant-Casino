@@ -246,3 +246,85 @@ exports.gamesCrash = functions.https.onRequest(async (req, res) => {
     return res.status(code).json({ error: e.message || 'Internal error' });
   }
 });
+
+// --- Stats, Achievements, Leaderboard ---
+exports.usersStats = functions.https.onRequest(async (req, res) => {
+  try {
+    if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+    const decoded = await verify(req);
+    const playsSnap = await db.collection('gamePlays').where('userId','==',decoded.uid).get();
+    let totalGames = 0, totalWins = 0, totalWagered = 0, totalWon = 0, netProfit = 0, biggestWin = 0;
+    const breakdown = {};
+    playsSnap.forEach(doc=>{
+      const p = doc.data();
+      totalGames++;
+      if (p.outcome==='win' || p.outcome==='jackpot') totalWins++;
+      totalWagered += p.betAmount||0;
+      totalWon += p.winAmount||0;
+      netProfit += p.profit||0;
+      biggestWin = Math.max(biggestWin, p.winAmount||0);
+      breakdown[p.gameName] = breakdown[p.gameName] || { game:p.gameName, plays:0, wins:0, profit:0 };
+      breakdown[p.gameName].plays++;
+      breakdown[p.gameName].wins += (p.outcome==='win'||p.outcome==='jackpot')?1:0;
+      breakdown[p.gameName].profit += p.profit||0;
+    });
+    const gameBreakdown = Object.values(breakdown);
+    const stats = { total_games: totalGames, total_wins: totalWins, total_wagered: totalWagered, total_won: totalWon, net_profit: netProfit, biggest_win: biggestWin, avg_bet: totalGames? (totalWagered/totalGames):0 };
+    return res.json({ stats: { ...stats, winRate: totalGames>0 ? (totalWins/totalGames*100).toFixed(2) : 0 }, gameBreakdown });
+  } catch (e) {
+    const code = String(e.message || '').includes('Unauthorized') ? 401 : 500;
+    return res.status(code).json({ error: e.message || 'Internal error' });
+  }
+});
+
+exports.usersAchievements = functions.https.onRequest(async (req, res) => {
+  try {
+    if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+    const decoded = await verify(req);
+    // Simple derived achievements
+    const playsSnap = await db.collection('gamePlays').where('userId','==',decoded.uid).limit(100).get();
+    const ach = [];
+    if (!playsSnap.empty) ach.push({ title:'First Play', description:'Played your first game', unlocked_at: Date.now() });
+    let jackpot = false; playsSnap.forEach(d=>{ if(d.data().outcome==='jackpot') jackpot=true; });
+    if (jackpot) ach.push({ title:'Jackpot!', description:'Hit a jackpot', unlocked_at: Date.now() });
+    return res.json({ achievements: ach });
+  } catch (e) {
+    const code = String(e.message || '').includes('Unauthorized') ? 401 : 500;
+    return res.status(code).json({ error: e.message || 'Internal error' });
+  }
+});
+
+exports.usersLeaderboard = functions.https.onRequest(async (req, res) => {
+  try {
+    const type = (req.query.type||'profit');
+    const game = req.query.game || null;
+    const limit = parseInt(req.query.limit||'10',10);
+    let q = db.collection('gamePlays');
+    if (game) q = q.where('gameName','==',game);
+    const snap = await q.limit(1000).get();
+    const map = new Map();
+    snap.forEach(d=>{
+      const p=d.data();
+      const k=p.userId; const cur=map.get(k)||{ userId:k, profit:0, level:1 };
+      cur.profit += p.profit||0; map.set(k,cur);
+    });
+    let arr = Array.from(map.values());
+    if (type==='level') arr.sort((a,b)=> (b.level||1)-(a.level||1)); else arr.sort((a,b)=> (b.profit||0)-(a.profit||0));
+    arr = arr.slice(0,limit);
+    return res.json({ leaderboard: arr });
+  } catch (e) {
+    return res.status(500).json({ error: e.message || 'Internal error' });
+  }
+});
+
+exports.gamesVerify = functions.https.onRequest(async (req, res) => {
+  try {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    const { seed, hash } = req.body || {};
+    // For our stub RNG, we just echo seed==hash as valid
+    const valid = !!seed && seed === hash;
+    return res.json({ valid });
+  } catch (e) {
+    return res.status(500).json({ error: e.message || 'Internal error' });
+  }
+});
