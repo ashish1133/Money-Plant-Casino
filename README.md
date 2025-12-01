@@ -39,6 +39,7 @@ An end‑to‑end demo casino platform: rich animated frontend + Node.js/Express
 ## 🗂 Firestore Registration Mirroring
 - On signup, login, and social sign-in, the app writes a registration document to Firestore in collection `registure_users` with fields: `uid, email, name, phone, age, gender, provider, createdAt, updatedAt`.
 - Collection can be overridden via `<meta name="register-collection" content="...">` (set in `userlogin/index.html`). Default is `registure_users`.
+- If the client-side write is blocked (rules/domain issues), the frontend automatically calls the backend fallback (`POST /api/users/registration-sync`) which uses the Firebase Admin SDK to upsert the document.
 - Rules (publish in Firebase Console → Firestore → Rules):
 ```rules
 rules_version = '2';
@@ -50,7 +51,21 @@ service cloud.firestore {
    }
 }
 ```
-- UI: After login, click “My Registration” in the header to view your doc.
+- UI: After login, click “My Registration” in the header to view your doc. The modal shows diagnostics (project, collection, auth state, last error) to help troubleshoot.
+
+### Firestore Troubleshooting Checklist
+1. **Publish Security Rules** – Copy `docs/firestore.rules` into Firebase Console → Firestore → Rules → Publish.
+2. **Authorized Domains** – Firebase Console → Authentication → Settings → Authorized domains → add `localhost`, your deployed domain(s), and `127.0.0.1` if needed.
+3. **Admin Credentials** – In `server/.env`, set either `FIREBASE_SERVICE_ACCOUNT_PATH` (path to JSON) or the trio `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` (use literal `\n` in the private key). Restart the backend.
+4. **Verify Backend Access** – Run the debug helper:
+   ```powershell
+   Push-Location "c:\Users\alaga\Downloads\Money-Plant-Casino-main\server"
+   npm install
+   node scripts/debug-firestore.js
+   ```
+   You should see `[PASS] Write succeeded` and `[PASS] Read back doc`. If it fails, the console message points to the missing configuration.
+5. **Client Diagnostics** – Login, open “My Registration,” press “Sync Now,” and note the Diagnostics panel (project, collection, last error). Share these details if further help is needed.
+6. **Confirm in Console** – In Firestore → Data → `registure_users`, verify a document with your Firebase `uid` exists after running Sync Now.
 
 ## 🌐 API Overview (High Level)
 | Endpoint | Method | Description |
