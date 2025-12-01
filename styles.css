@@ -518,11 +518,11 @@ body.nav-menu-open {
     .nav-container { position: relative; grid-template-columns: 1fr auto; grid-template-areas: 'logo actions' 'links links'; row-gap: 0.5rem; }
     .nav-links {
         position: fixed;
-        top: 48px;
+        top: 44px;
         right: 0;
         width: 260px;
         max-width: 85vw;
-        height: calc(100vh - 48px);
+        height: calc(100vh - 44px);
         padding: 1rem;
         display: flex;
         flex-direction: column;
@@ -555,7 +555,7 @@ body.nav-menu-open {
 /* Mobile menu visual polish */
 @media (max-width: 1024px) {
     .nav-links a, .nav-links .nav-btn {
-        padding: 0.52rem 0.65rem;
+        padding: 0.48rem 0.6rem;
         border-radius: 10px;
         border: 1px solid rgba(255,255,255,0.06);
         background: rgba(255,255,255,0.03);
@@ -675,6 +675,28 @@ body.nav-menu-open {
 .balance-amount { font-size: 0.9rem; min-width: 72px; }
 
 /* User Profile */
+.navbar .nav-container { padding: 0 12px; }
+.navbar { padding: 0.2rem 0; }
+.navbar.nav-shrink { padding: 0.12rem 0; }
+.nav-link { font-size: 0.9rem; }
+.icon-btn { padding: 0.22rem 0.46rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+.logo { font-size: 0.95rem; gap: 6px; }
+.logo-icon { font-size: 1.1rem; }
+.balance { padding: 0.26rem 0.5rem; border-width: 1px; box-shadow: none; backdrop-filter: none; }
+.balance-amount { font-size: 0.88rem; min-width: 68px; letter-spacing: 0.2px; }
+.nav-container { column-gap: 0.45rem; }
+
+@media (max-width: 768px) {
+    .navbar .user-section { gap: 0.45rem; }
+    .navbar .user-section .icon-btn { padding: 0.36rem 0.62rem; }
+}
+
+@media (max-width: 520px) {
+    .navbar .nav-container { padding: 0 10px; }
+    .balance-label { display: none; }
+    .balance-amount { min-width: 56px; font-size: 0.86rem; }
+    .nav-toggle { transform: scale(0.9); }
+}
 .user-profile {
     display: flex;
     align-items: center;
@@ -784,7 +806,7 @@ body.nav-menu-open {
 /* Notification System */
 .notification-container {
     position: fixed;
-    top: 50px;
+    top: 46px;
     right: 20px;
     z-index: 3000;
     display: flex;
