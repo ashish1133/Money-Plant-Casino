@@ -173,3 +173,76 @@ exports.gamesRoulette = functions.https.onRequest(async (req, res) => {
     return res.status(code).json({ error: e.message || 'Internal error' });
   }
 });
+
+exports.gamesDice = functions.https.onRequest(async (req, res) => {
+  try {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    const decoded = await verify(req);
+    const { betAmount, target } = req.body || {};
+    const bet = parseInt(betAmount, 10);
+    const tgt = parseInt(target, 10);
+    if (!Number.isFinite(bet) || bet < 10) return res.status(400).json({ error: 'Minimum bet is $10' });
+    if (!Number.isFinite(tgt) || tgt < 2 || tgt > 98) return res.status(400).json({ error: 'Target must be 2–98' });
+    const seed = `${decoded.uid}:${Date.now()}`;
+    const roll = Math.floor(rng(seed) * 100) + 1; // 1–100
+    const win = roll < tgt ? Math.round(bet * (99 / (tgt - 1)) - bet) + bet : 0; // simple multiplier approximation
+    const userRef = db.collection('users').doc(decoded.uid);
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(userRef);
+      const u = snap.exists ? snap.data() : { uid: decoded.uid, balance: 10000 };
+      const balanceAfter = (u.balance || 0) - bet + win;
+      tx.set(userRef, { uid: decoded.uid, balance: balanceAfter, updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+      tx.set(db.collection('gamePlays').doc(), {
+        userId: decoded.uid,
+        gameName: 'dice',
+        betAmount: bet,
+        winAmount: win,
+        profit: win - bet,
+        outcome: win>0 ? 'win':'loss',
+        details: { roll, target: tgt },
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    return res.json({ roll, target: tgt, winAmount: win, seed, hash: seed });
+  } catch (e) {
+    const code = String(e.message || '').includes('Unauthorized') ? 401 : 500;
+    return res.status(code).json({ error: e.message || 'Internal error' });
+  }
+});
+
+exports.gamesCrash = functions.https.onRequest(async (req, res) => {
+  try {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    const decoded = await verify(req);
+    const { betAmount, autoCashout } = req.body || {};
+    const bet = parseInt(betAmount, 10);
+    const auto = parseFloat(autoCashout);
+    if (!Number.isFinite(bet) || bet < 10) return res.status(400).json({ error: 'Minimum bet is $10' });
+    if (!Number.isFinite(auto) || auto < 1.01) return res.status(400).json({ error: 'Auto cashout must be ≥ 1.01x' });
+    const seed = `${decoded.uid}:${Date.now()}`;
+    const bust = 1 + rng(seed) * 10; // 1–11x range
+    const cashedOut = auto <= bust;
+    const win = cashedOut ? Math.round(bet * auto) : 0;
+    const userRef = db.collection('users').doc(decoded.uid);
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(userRef);
+      const u = snap.exists ? snap.data() : { uid: decoded.uid, balance: 10000 };
+      const balanceAfter = (u.balance || 0) - bet + win;
+      tx.set(userRef, { uid: decoded.uid, balance: balanceAfter, updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+      tx.set(db.collection('gamePlays').doc(), {
+        userId: decoded.uid,
+        gameName: 'crash',
+        betAmount: bet,
+        winAmount: win,
+        profit: win - bet,
+        outcome: cashedOut ? 'win':'loss',
+        details: { bust: parseFloat(bust.toFixed(2)), autoCashout: auto },
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    return res.json({ bust: parseFloat(bust.toFixed(2)), auto: auto, cashedOut, winAmount: win, seed, hash: seed });
+  } catch (e) {
+    const code = String(e.message || '').includes('Unauthorized') ? 401 : 500;
+    return res.status(code).json({ error: e.message || 'Internal error' });
+  }
+});
